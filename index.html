@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>happy birthday annie</title>
+<title>Happy Birthday Annie</title>
 
 <style>
 html, body {
@@ -44,7 +44,7 @@ html, body {
   display: none;
   justify-content: center;
   align-items: center;
-  gap: 4px;
+  gap: 8px; /* restored spacing */
 }
 
 #bow img {
@@ -53,11 +53,11 @@ html, body {
 }
 
 #bow img:first-child {
-  margin-right: -12px;
+  margin-right: -6px;
 }
 
 #bow img:last-child {
-  margin-left: -12px;
+  margin-left: -6px;
 }
 
 #bow.untie img:first-child {
@@ -160,7 +160,7 @@ app.appendChild(bow);
 /* main */
 const main = document.createElement("div");
 main.id = "main";
-main.innerHTML = `<div id="title">happy birthday annie</div>`;
+main.innerHTML = `<div id="title"></div>`;
 app.appendChild(main);
 
 /* floating images */
@@ -220,6 +220,19 @@ function makeDraggable(el) {
   window.addEventListener("touchend", end);
 }
 
+/* typewriter effect for title */
+function spellTitle() {
+  const titleEl = document.getElementById("title");
+  const text = "Happy Birthday Annie";
+  let i = 0;
+  titleEl.textContent = "";
+  const interval = setInterval(() => {
+    titleEl.textContent += text[i];
+    i++;
+    if (i >= text.length) clearInterval(interval);
+  }, 150); // speed in ms
+}
+
 /* progression */
 document.body.addEventListener("click", () => {
   if (slideIndex < slides.length - 1) {
@@ -246,6 +259,7 @@ bow.addEventListener("click", (e) => {
   setTimeout(() => {
     bow.style.display = "none";
     main.style.display = "block";
+    spellTitle(); // typewriter shows the title
   }, 700);
 });
 </script>
