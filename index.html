@@ -1,177 +1,194 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Happy Birthday Annie</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>happy birthday annie</title>
+
 <style>
 html, body {
-  margin:0; padding:0;
-  width:100%; height:100%;
-  background:#ffd7e8;
-  font-family:'Comic Sans MS', cursive;
-  overflow:hidden;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: #ffd7e8;
+  overflow: hidden;
+  font-family: "comic sans ms", cursive;
+  cursor: pointer;
 }
 
-/* slideshow */
-#slideshow {
-  position:fixed; inset:0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  cursor:pointer;
-  z-index:20;
+#app {
+  width: 100%;
+  height: 100%;
+  position: relative;
 }
 
-#slideshow img {
-  max-width:80%;
-  max-height:80%;
-  border-radius:20px;
-  box-shadow:0 4px 20px rgba(0,0,0,0.2);
-  transition: transform 0.3s ease;
+/* slides */
+.slide {
+  position: absolute;
+  inset: 0;
+  display: none;
+  justify-content: center;
+  align-items: center;
 }
 
-/* main page */
+.slide img {
+  max-width: 70%;
+  max-height: 70%;
+}
+
+/* bow */
+#bow {
+  position: absolute;
+  inset: 0;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+}
+
+#bow img {
+  width: 160px;
+  transition: transform 0.6s ease, opacity 0.6s ease;
+}
+
+#bow.untie img:first-child {
+  transform: translateX(-200px) rotate(-20deg);
+  opacity: 0;
+}
+
+#bow.untie img:last-child {
+  transform: translateX(200px) rotate(20deg);
+  opacity: 0;
+}
+
+/* main */
 #main {
-  display:none;
-  width:100%; height:100%;
-  position:relative;
-  text-align:center;
+  display: none;
+  width: 100%;
+  height: 100%;
+  position: relative;
 }
 
 #title {
-  position:absolute;
-  top:8%; left:50%;
-  transform:translateX(-50%);
-  font-size:3rem;
-  color:white;
-  text-shadow:0 4px 10px #ff9ecb;
-  opacity:0;
-  transition:opacity 1s ease;
+  position: absolute;
+  top: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 3em;
+  color: white;
+  text-shadow: 2px 2px 6px #ff9ed9;
 }
 
 /* floating pics */
 .float {
-  position:absolute;
-  animation: float 3s ease-in-out infinite alternate;
+  position: absolute;
+  width: 90px;
+  animation: float 4s ease-in-out infinite alternate;
 }
 
 @keyframes float {
-  0% { transform:translateY(0); }
-  50% { transform:translateY(-20px); }
-  100% { transform:translateY(0); }
-}
-
-/* sparkles */
-.sparkle {
-  position:absolute;
-  width:8px; height:8px;
-  background:white;
-  border-radius:50%;
-  opacity:0.7;
-  animation:sparkle 2s infinite;
-}
-
-@keyframes sparkle {
-  0% { transform: translateY(0); opacity:0.7; }
-  50% { transform: translateY(-25px); opacity:0.3; }
-  100% { transform: translateY(0); opacity:0.7; }
+  from { transform: translateY(0); }
+  to { transform: translateY(-25px); }
 }
 </style>
 </head>
+
 <body>
-
-<!-- Intro Slideshow -->
-<div id="slideshow">
-  <img src="1 pssst.png" id="slide-img" alt="intro slide">
-</div>
-
-<!-- Main Page -->
-<div id="main">
-  <div id="title">Happy Birthday Annie</div>
-
-  <!-- Floating pics -->
-  <img src="pic (1).png" class="float" style="left:10%; top:10%; width:80px;">
-  <img src="pic (2).png" class="float" style="left:20%; top:20%; width:80px;">
-  <img src="pic (3).png" class="float" style="left:30%; top:30%; width:80px;">
-  <img src="pic (4).png" class="float" style="left:40%; top:40%; width:80px;">
-  <img src="pic (5).png" class="float" style="left:50%; top:50%; width:80px;">
-  <!-- add up to pic (75).png as needed -->
-
-  <!-- main characters -->
-  <img src="pic (38).png" class="float" style="left:15%; top:30%; width:120px;" alt="hello kitty">
-  <img src="pic (39).png" class="float" style="right:15%; top:30%; width:120px;" alt="miffy">
-  <img src="pic (40).png" class="float" style="left:50%; top:55%; transform:translate(-50%,-50%); width:140px;" alt="cake">
-</div>
+<div id="app"></div>
 
 <script>
-// slides
-const slides = ["1 pssst.png","2 i heard.png","3 its ur special day.png","4 ok follow me.png","5 through here.png"];
-let currentSlide = 0;
-const slideshow = document.getElementById("slideshow");
-const slideImg = document.getElementById("slide-img");
-const main = document.getElementById("main");
+const app = document.getElementById("app");
 
-// click anywhere to advance slideshow
-slideshow.addEventListener("click", () => {
-  currentSlide++;
-  if(currentSlide < slides.length){
-    slideImg.src = slides[currentSlide];
-  } else {
-    // hide slideshow
-    slideshow.style.display = "none";
+/* ---------- intro slides ---------- */
+const slides = [
+  "slide1.png",
+  "slide2.png",
+  "slide3.png",
+  "slide4.png",
+  "slide5.png"
+];
 
-    // create bow container dynamically
-    const bowContainer = document.createElement("div");
-    bowContainer.style.position="fixed";
-    bowContainer.style.inset="0";
-    bowContainer.style.display="flex";
-    bowContainer.style.justifyContent="center";
-    bowContainer.style.alignItems="center";
-    bowContainer.style.zIndex="50";
+let slideIndex = 0;
 
-    const bowLeft = document.createElement("img");
-    bowLeft.src="bow left.png";
-    bowLeft.style.width="150px";
-    bowLeft.style.margin="0 10px";
-    bowLeft.style.cursor="pointer";
+slides.forEach((src, i) => {
+  const s = document.createElement("div");
+  s.className = "slide";
+  if (i === 0) s.style.display = "flex";
 
-    const bowRight = document.createElement("img");
-    bowRight.src="bow right.png";
-    bowRight.style.width="150px";
-    bowRight.style.margin="0 10px";
-    bowRight.style.cursor="pointer";
+  const img = document.createElement("img");
+  img.src = src;
+  s.appendChild(img);
 
-    bowContainer.appendChild(bowLeft);
-    bowContainer.appendChild(bowRight);
-    document.body.appendChild(bowContainer);
+  app.appendChild(s);
+});
 
-    // bow click function
-    function untieBow(){
-      bowLeft.style.transform="translateX(-200px) rotate(-45deg)";
-      bowRight.style.transform="translateX(200px) rotate(45deg)";
-      setTimeout(()=>{
-        bowContainer.style.display="none";
-        main.style.display="block";
-        document.getElementById("title").style.opacity=1;
+const slideEls = document.querySelectorAll(".slide");
 
-        // optional sparkles
-        for(let i=0;i<20;i++){
-          const s = document.createElement("div");
-          s.className="sparkle";
-          s.style.left=Math.random()*100+"%";
-          s.style.top=Math.random()*100+"%";
-          s.style.animationDuration=(1+Math.random()*2)+"s";
-          main.appendChild(s);
-        }
-      },600);
-    }
+/* ---------- bow ---------- */
+const bow = document.createElement("div");
+bow.id = "bow";
+bow.innerHTML = `
+  <img src="bowleft.png">
+  <img src="bowright.png">
+`;
+app.appendChild(bow);
 
-    bowLeft.addEventListener("click", untieBow);
-    bowRight.addEventListener("click", untieBow);
+/* ---------- main page ---------- */
+const main = document.createElement("div");
+main.id = "main";
+main.innerHTML = `<div id="title">happy birthday annie</div>`;
+app.appendChild(main);
+
+/* floating images list (exactly what you uploaded) */
+const floatingPics = [
+  "pic2.png","pic3.png","pic4.png","pic5.png","pic6.png","pic7.png",
+  "pic8.png","pic9.png","pic10.png","pic11.png","pic12.png","pic13.png",
+  "pic14.png","pic15.png","pic16.png","pic18.png","pic19.png","pic20.png",
+  "pic21.png","pic22.png","pic23.png","pic24.png","pic25.png","pic26.png",
+  "pic28.png","pic29.png","pic30.png","pic31.png","pic32.png","pic33.png",
+  "pic34.png","pic35.png","pic36.png","pic38.png","pic39.png","pic40.png",
+  "pic41.png","pic42.png","pic43.png","pic44.png","pic45.png"
+];
+
+floatingPics.forEach(src => {
+  const img = document.createElement("img");
+  img.src = src;
+  img.className = "float";
+  img.style.left = Math.random() * 90 + "%";
+  img.style.top = Math.random() * 80 + "%";
+  img.style.animationDuration = 3 + Math.random() * 3 + "s";
+  main.appendChild(img);
+});
+
+/* ---------- click logic ---------- */
+document.body.addEventListener("click", () => {
+  // slides
+  if (slideIndex < slides.length - 1) {
+    slideEls[slideIndex].style.display = "none";
+    slideIndex++;
+    slideEls[slideIndex].style.display = "flex";
+    return;
+  }
+
+  // show bow
+  if (slideIndex === slides.length - 1 && bow.style.display !== "flex") {
+    slideEls[slideIndex].style.display = "none";
+    bow.style.display = "flex";
+    return;
   }
 });
-</script>
 
+/* bow click */
+bow.addEventListener("click", (e) => {
+  e.stopPropagation();
+  bow.classList.add("untie");
+
+  setTimeout(() => {
+    bow.style.display = "none";
+    main.style.display = "block";
+  }, 700);
+});
+</script>
 </body>
 </html>
