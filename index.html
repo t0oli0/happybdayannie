@@ -2,124 +2,84 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>happy birthday annie</title>
-
+<title>psst</title>
 <style>
 html, body {
   margin: 0;
   padding: 0;
   width: 100%;
   height: 100%;
-  background: #ffd7e8;
+  background: #f6b3c6;
   overflow: hidden;
-  font-family: "comic sans ms", cursive;
   cursor: pointer;
 }
 
-#app {
-  width: 100%;
-  height: 100%;
-  position: relative;
-}
-
-/* slides */
-.slide {
+#slideshow, #main {
   position: absolute;
   inset: 0;
-  display: none;
-  justify-content: center;
+  display: flex;
   align-items: center;
-}
-
-.slide img {
-  max-width: 70%;
-  max-height: 70%;
-}
-
-/* bow */
-#bow {
-  position: absolute;
-  inset: 0;
-  display: none;
   justify-content: center;
-  align-items: center;
-  gap: 8px; /* tighter */
 }
 
-#bow img {
-  width: 160px;
-  transition: transform 0.6s ease, opacity 0.6s ease;
+#slideshow img {
+  max-width: 80%;
+  max-height: 80%;
 }
 
-#bow img:first-child {
-  margin-right: -6px;
-}
-
-#bow img:last-child {
-  margin-left: -6px;
-}
-
-#bow.untie img:first-child {
-  transform: translateX(-200px) rotate(-20deg);
-  opacity: 0;
-}
-
-#bow.untie img:last-child {
-  transform: translateX(200px) rotate(20deg);
-  opacity: 0;
-}
-
-/* main */
-#main {
+.hidden {
   display: none;
-  width: 100%;
-  height: 100%;
-  position: relative;
 }
 
 #title {
   position: absolute;
-  top: 8%;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 3em;
-  color: white;
-  text-shadow: 2px 2px 6px #ff9ed9;
-  pointer-events: none;
+  top: 30px;
+  font-size: 48px;
+  font-family: serif;
+  color: #fff;
+  z-index: 5;
 }
 
-/* floating pics */
-.float {
+.floating {
   position: absolute;
-  width: 90px;
-  animation: float 4s ease-in-out infinite alternate;
+  width: 140px;
   cursor: grab;
-  touch-action: none;
+  user-select: none;
 }
 
-.float:active {
-  cursor: grabbing;
-  transform: scale(1.08);
+#bow {
+  position: absolute;
+  bottom: 60px;
+  display: flex;
+  gap: 10px; /* closer together */
+  z-index: 10;
 }
 
-@keyframes float {
-  from { transform: translateY(0); }
-  to { transform: translateY(-25px); }
+#bow img {
+  width: 140px;
 }
 </style>
 </head>
 
 <body>
-<div id="app"></div>
 
-<audio id="bowSound" src="bow.mp3" preload="auto"></audio>
+<div id="slideshow">
+  <img id="slide" src="slide1.png">
+</div>
+
+<div id="main" class="hidden">
+  <div id="title">happy birthday annie</div>
+
+  <div id="bow">
+    <img src="bowleft.png">
+    <img src="bowright.png">
+  </div>
+</div>
+
+<audio id="wow" src="wow.mp3"></audio>
 
 <script>
-const app = document.getElementById("app");
-const bowSound = document.getElementById("bowSound");
-
-/* slides */
+/* ---------- slideshow ---------- */
 const slides = [
   "slide1.png",
   "slide2.png",
@@ -129,37 +89,24 @@ const slides = [
 ];
 
 let slideIndex = 0;
+const slideEl = document.getElementById("slide");
+const slideshow = document.getElementById("slideshow");
+const main = document.getElementById("main");
 
-slides.forEach((src, i) => {
-  const s = document.createElement("div");
-  s.className = "slide";
-  if (i === 0) s.style.display = "flex";
+document.body.addEventListener("click", () => {
+  if (slideshow.classList.contains("hidden")) return;
 
-  const img = document.createElement("img");
-  img.src = src;
-  s.appendChild(img);
-
-  app.appendChild(s);
+  slideIndex++;
+  if (slideIndex < slides.length) {
+    slideEl.src = slides[slideIndex];
+  } else {
+    slideshow.classList.add("hidden");
+    main.classList.remove("hidden");
+    spawnFloatingImages();
+  }
 });
 
-const slideEls = document.querySelectorAll(".slide");
-
-/* bow */
-const bow = document.createElement("div");
-bow.id = "bow";
-bow.innerHTML = `
-  <img src="bowleft.png">
-  <img src="bowright.png">
-`;
-app.appendChild(bow);
-
-/* main */
-const main = document.createElement("div");
-main.id = "main";
-main.innerHTML = `<div id="title">happy birthday annie</div>`;
-app.appendChild(main);
-
-/* floating images */
+/* ---------- floating images ---------- */
 const floatingPics = [
   "pic2.png","pic3.png","pic4.png","pic5.png","pic6.png","pic7.png",
   "pic8.png","pic9.png","pic10.png","pic11.png","pic12.png","pic13.png",
@@ -170,80 +117,48 @@ const floatingPics = [
   "pic41.png","pic42.png","pic43.png","pic44.png","pic45.png"
 ];
 
-floatingPics.forEach(src => {
-  const img = document.createElement("img");
-  img.src = src;
-  img.className = "float";
-  img.style.left = Math.random() * 85 + "%";
-  img.style.top = Math.random() * 75 + "%";
-  img.style.animationDuration = 3 + Math.random() * 3 + "s";
-  makeDraggable(img);
-  main.appendChild(img);
-});
+function spawnFloatingImages() {
+  floatingPics.forEach(src => {
+    const img = document.createElement("img");
+    img.src = src;
+    img.className = "floating";
+    img.style.left = Math.random() * (window.innerWidth - 150) + "px";
+    img.style.top = Math.random() * (window.innerHeight - 200) + "px";
 
-/* drag */
-function makeDraggable(el) {
-  let dragging = false;
-  let offsetX = 0;
-  let offsetY = 0;
-
-  const start = (e) => {
-    dragging = true;
-    const p = e.touches ? e.touches[0] : e;
-    offsetX = p.clientX - el.offsetLeft;
-    offsetY = p.clientY - el.offsetTop;
-    el.style.animationPlayState = "paused";
-    e.stopPropagation();
-  };
-
-  const move = (e) => {
-    if (!dragging) return;
-    const p = e.touches ? e.touches[0] : e;
-    el.style.left = p.clientX - offsetX + "px";
-    el.style.top = p.clientY - offsetY + "px";
-  };
-
-  const end = () => {
-    dragging = false;
-    el.style.animationPlayState = "running";
-  };
-
-  el.addEventListener("mousedown", start);
-  el.addEventListener("touchstart", start);
-  window.addEventListener("mousemove", move);
-  window.addEventListener("touchmove", move);
-  window.addEventListener("mouseup", end);
-  window.addEventListener("touchend", end);
+    makeDraggable(img);
+    main.appendChild(img);
+  });
 }
 
-/* progression */
-document.body.addEventListener("click", () => {
-  if (slideIndex < slides.length - 1) {
-    slideEls[slideIndex].style.display = "none";
-    slideIndex++;
-    slideEls[slideIndex].style.display = "flex";
-    return;
-  }
+/* ---------- drag logic ---------- */
+function makeDraggable(el) {
+  let offsetX, offsetY, dragging = false;
 
-  if (slideIndex === slides.length - 1 && bow.style.display !== "flex") {
-    slideEls[slideIndex].style.display = "none";
-    bow.style.display = "flex";
-    return;
-  }
-});
+  el.addEventListener("mousedown", e => {
+    dragging = true;
+    offsetX = e.clientX - el.offsetLeft;
+    offsetY = e.clientY - el.offsetTop;
+    el.style.cursor = "grabbing";
+  });
 
-/* bow click */
-bow.addEventListener("click", (e) => {
+  document.addEventListener("mousemove", e => {
+    if (!dragging) return;
+    el.style.left = e.clientX - offsetX + "px";
+    el.style.top = e.clientY - offsetY + "px";
+  });
+
+  document.addEventListener("mouseup", () => {
+    dragging = false;
+    el.style.cursor = "grab";
+  });
+}
+
+/* ---------- bow sound ---------- */
+document.getElementById("bow").addEventListener("click", e => {
   e.stopPropagation();
-  bowSound.currentTime = 0;
-  bowSound.play();
-  bow.classList.add("untie");
-
-  setTimeout(() => {
-    bow.style.display = "none";
-    main.style.display = "block";
-  }, 700);
+  document.getElementById("wow").play();
 });
 </script>
+
 </body>
 </html>
