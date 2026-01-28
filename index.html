@@ -40,11 +40,14 @@ html, body {
 /* bow */
 #bow {
   position: absolute;
-  inset: 0;
   display: none;
   justify-content: center;
   align-items: center;
-  gap: 8px; /* restored spacing */
+  gap: 8px; /* spacing restored */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
 }
 
 #bow img {
@@ -70,7 +73,19 @@ html, body {
   opacity: 0;
 }
 
-/* main */
+/* door */
+#door {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  display: none;
+  z-index: 4;
+  max-width: 300px;
+}
+
+/* main page */
 #main {
   display: none;
   width: 100%;
@@ -100,6 +115,7 @@ html, body {
   animation-direction: alternate;
   cursor: grab;
   touch-action: none;
+  z-index: 1;
 }
 
 .float:active {
@@ -117,11 +133,14 @@ html, body {
 <body>
 <div id="app"></div>
 
-<audio id="bowSound" src="wow.mp3" preload="auto"></audio>
+<!-- audio -->
+<audio id="bowSound" src="ribbon.mp3" preload="auto"></audio>
+<audio id="doorSound" src="doorwow.mp3" preload="auto"></audio>
 
 <script>
 const app = document.getElementById("app");
 const bowSound = document.getElementById("bowSound");
+const doorSound = document.getElementById("doorSound");
 
 /* slides */
 const slides = [
@@ -156,6 +175,12 @@ bow.innerHTML = `
   <img src="bowright.png">
 `;
 app.appendChild(bow);
+
+/* door */
+const door = document.createElement("img");
+door.id = "door";
+door.src = "doorclosed.png";
+app.appendChild(door);
 
 /* main */
 const main = document.createElement("div");
@@ -220,20 +245,27 @@ function makeDraggable(el) {
   window.addEventListener("touchend", end);
 }
 
-/* typewriter effect for title */
-function spellTitle() {
+/* typewriter effect loop */
+function startTypewriter() {
   const titleEl = document.getElementById("title");
   const text = "Happy Birthday Annie";
   let i = 0;
-  titleEl.textContent = "";
-  const interval = setInterval(() => {
-    titleEl.textContent += text[i];
-    i++;
-    if (i >= text.length) clearInterval(interval);
-  }, 150); // speed in ms
+  let forward = true;
+
+  setInterval(() => {
+    if (forward) {
+      titleEl.textContent += text[i];
+      i++;
+      if (i >= text.length) forward = false;
+    } else {
+      titleEl.textContent = text.substring(0, i);
+      i--;
+      if (i <= 0) forward = true;
+    }
+  }, 150);
 }
 
-/* progression */
+/* slide progression */
 document.body.addEventListener("click", () => {
   if (slideIndex < slides.length - 1) {
     slideEls[slideIndex].style.display = "none";
@@ -244,7 +276,8 @@ document.body.addEventListener("click", () => {
 
   if (slideIndex === slides.length - 1 && bow.style.display !== "flex") {
     slideEls[slideIndex].style.display = "none";
-    bow.style.display = "flex";
+    bow.style.display = "flex"; // bow overlay on door
+    door.style.display = "block"; // show closed door behind bow
     return;
   }
 });
@@ -258,9 +291,23 @@ bow.addEventListener("click", (e) => {
 
   setTimeout(() => {
     bow.style.display = "none";
-    main.style.display = "block";
-    spellTitle(); // typewriter shows the title
+    // door still visible, now clickable
   }, 700);
+});
+
+/* door click */
+door.addEventListener("click", (e) => {
+  e.stopPropagation();
+  doorSound.currentTime = 0;
+  doorSound.play();
+  door.src = "dooropen.png";
+
+  // small delay before showing main page
+  setTimeout(() => {
+    door.style.display = "none";
+    main.style.display = "block";
+    startTypewriter();
+  }, 1000); // 1 second delay to let sound play
 });
 </script>
 </body>
