@@ -9,7 +9,8 @@
 html,body{
   margin:0;padding:0;width:100%;height:100%;
   background:#ffd7e8;overflow:hidden;
-  font-family:"Comic Sans MS",cursive;cursor:pointer;
+  font-family:"Comic Sans MS",cursive;
+  cursor:pointer;
 }
 #app{width:100%;height:100%;position:relative}
 
@@ -18,7 +19,11 @@ html,body{
 .slide img{max-width:70%;max-height:70%}
 
 /* bow */
-#bow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:none;gap:8px;z-index:5}
+#bow{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  display:none;gap:8px;z-index:5
+}
 #bow img{width:160px;transition:.6s}
 #bow img:first-child{margin-right:-6px}
 #bow img:last-child{margin-left:-6px}
@@ -26,25 +31,55 @@ html,body{
 #bow.untie img:last-child{transform:translateX(220px) rotate(20deg);opacity:0}
 
 /* door */
-#door{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:none;max-width:300px;z-index:4}
+#door{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  display:none;max-width:300px;z-index:4
+}
 
 /* main */
 #main{display:none;width:100%;height:100%;position:relative}
-#title{position:absolute;top:8%;left:50%;transform:translateX(-50%);font-size:3em;color:white;text-shadow:2px 2px 6px #ff9ed9}
+#title{
+  position:absolute;top:8%;left:50%;
+  transform:translateX(-50%);
+  font-size:3em;color:white;
+  text-shadow:2px 2px 6px #ff9ed9
+}
 
 /* floating */
-.float{position:absolute;width:90px;animation:float 4s ease-in-out infinite alternate;cursor:grab}
+.float{
+  position:absolute;width:90px;
+  animation:float 4s ease-in-out infinite alternate;
+  cursor:grab
+}
 @keyframes float{from{transform:translateY(0)}to{transform:translateY(-25px)}}
 
-/* game */
-#overlay{display:none;position:fixed;inset:0;background:rgba(255,215,232,.92);z-index:999;display:flex;justify-content:center;align-items:center}
-#game{position:relative;width:520px;height:360px;background:#ffb6d9;border-radius:14px}
-#exit{position:absolute;top:8px;right:12px;color:white;font-size:22px;cursor:pointer}
-
+/* feeding game overlay */
+#overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(255,215,232,.92);
+  z-index:999;
+  justify-content:center;
+  align-items:center
+}
+#game{
+  position:relative;
+  width:520px;height:360px;
+  background:#ffb6d9;border-radius:14px
+}
+#exit{
+  position:absolute;top:8px;right:12px;
+  font-size:22px;color:white;cursor:pointer
+}
 #cat{position:absolute;left:40px;bottom:40px;width:180px}
 #cake{position:absolute;right:110px;bottom:80px;width:90px}
 #knife{position:absolute;right:40px;bottom:80px;width:60px}
-#slice{position:absolute;width:90px;display:none;pointer-events:none}
+#slice{
+  position:absolute;width:90px;
+  display:none;pointer-events:none
+}
 </style>
 </head>
 
@@ -65,87 +100,102 @@ html,body{
 </div>
 
 <script>
-/* ---------------- BASE SITE ---------------- */
+/* ---------- base site ---------- */
 const app=document.getElementById("app");
 const ribbonSound=document.getElementById("ribbonSound");
 const doorSound=document.getElementById("doorSound");
 
 /* slides */
 const slides=["slide1.png","slide2.png","slide3.png","slide4.png","slide5.png"];
-let s=0;
+let slideIndex=0;
 slides.forEach((src,i)=>{
   const d=document.createElement("div");
-  d.className="slide";if(i===0)d.style.display="flex";
-  const img=document.createElement("img");img.src=src;d.appendChild(img);app.appendChild(d);
+  d.className="slide";
+  if(i===0)d.style.display="flex";
+  const img=document.createElement("img");
+  img.src=src;
+  d.appendChild(img);
+  app.appendChild(d);
 });
 const slideEls=document.querySelectorAll(".slide");
 
 /* bow */
 const bow=document.createElement("div");
-bow.id="bow";bow.innerHTML=`<img src="bowleft.png"><img src="bowright.png">`;
+bow.id="bow";
+bow.innerHTML=`<img src="bowleft.png"><img src="bowright.png">`;
 app.appendChild(bow);
 
 /* door */
 const door=document.createElement("img");
-door.id="door";door.src="doorclosed.png";app.appendChild(door);
+door.id="door";
+door.src="doorclosed.png";
+app.appendChild(door);
 
 /* main */
 const main=document.createElement("div");
-main.id="main";main.innerHTML=`<div id="title"></div>`;app.appendChild(main);
+main.id="main";
+main.innerHTML=`<div id="title"></div>`;
+app.appendChild(main);
 
 /* floating pics */
-const pics=["pic2.png","pic3.png","pic4.png","pic5.png","pic6.png","pic7.png","pic8.png","pic9.png","pic10.png",
-"pic11.png","pic12.png","pic13.png","pic14.png","pic15.png","pic16.png","pic18.png","pic19.png","pic20.png",
-"pic21.png","pic22.png","pic23.png","pic24.png","pic25.png","pic26.png","pic28.png","pic29.png","pic30.png",
-"pic31.png","pic32.png","pic33.png","pic34.png","pic35.png","pic36.png","pic38.png","pic39.png","pic40.png",
-"pic41.png","pic42.png","pic43.png","pic44.png","pic45.png"];
-
+const pics=["pic2.png","pic3.png","pic4.png","pic5.png","pic6.png","pic7.png","pic8.png","pic9.png","pic10.png"];
 pics.forEach(src=>{
   const img=document.createElement("img");
-  img.src=src;img.className="float";
-  img.style.left=Math.random()*85+"%";img.style.top=Math.random()*75+"%";
-  img.style.animationDuration=(3+Math.random()*3)+"s";
+  img.src=src;
+  img.className="float";
+  img.style.left=Math.random()*85+"%";
+  img.style.top=Math.random()*75+"%";
   main.appendChild(img);
-  drag(img);
 });
 
-/* drag */
-function drag(el){
-  let d=false,ox,oy;
-  el.onmousedown=e=>{d=true;ox=e.clientX-el.offsetLeft;oy=e.clientY-el.offsetTop;e.stopPropagation()};
-  window.onmousemove=e=>{if(!d)return;el.style.left=e.clientX-ox+"px";el.style.top=e.clientY-oy+"px"};
-  window.onmouseup=()=>d=false;
-}
-
 /* typewriter */
-function type(){
-  const t=document.getElementById("title"),txt="Happy Birthday Annie";let i=0,f=true;
-  setInterval(()=>{t.textContent=txt.slice(0,f?++i:--i);if(i>=txt.length)f=false;if(i<=0)f=true},150);
+function typewriter(){
+  const t=document.getElementById("title");
+  const text="Happy Birthday Annie";
+  let i=0,f=true;
+  setInterval(()=>{
+    t.textContent=text.slice(0,f?++i:--i);
+    if(i>=text.length)f=false;
+    if(i<=0)f=true;
+  },150);
 }
 
-/* flow */
+/* progression */
 let mainShown=false;
 document.body.onclick=()=>{
   if(mainShown)return;
-  if(s<slides.length-1){slideEls[s++].style.display="none";slideEls[s].style.display="flex";return}
-  slideEls[s].style.display="none";bow.style.display="flex";door.style.display="block";
+  if(slideIndex<slides.length-1){
+    slideEls[slideIndex++].style.display="none";
+    slideEls[slideIndex].style.display="flex";
+    return;
+  }
+  slideEls[slideIndex].style.display="none";
+  bow.style.display="flex";
+  door.style.display="block";
 };
 
 bow.onclick=e=>{
   e.stopPropagation();
-  ribbonSound.currentTime=0;ribbonSound.play();
+  ribbonSound.currentTime=0;
+  ribbonSound.play();
   bow.classList.add("untie");
   setTimeout(()=>bow.style.display="none",700);
 };
 
 door.onclick=e=>{
   e.stopPropagation();
-  doorSound.currentTime=0;doorSound.play();
+  doorSound.currentTime=0;
+  doorSound.play();
   door.src="dooropen.png";
-  setTimeout(()=>{door.style.display="none";main.style.display="block";mainShown=true;type()},1000);
+  setTimeout(()=>{
+    door.style.display="none";
+    main.style.display="block";
+    mainShown=true;
+    typewriter();
+  },1000);
 };
 
-/* ---------------- CAT GAME ---------------- */
+/* ---------- feeding game ---------- */
 const overlay=document.getElementById("overlay");
 const cat=document.getElementById("cat");
 const cake=document.getElementById("cake");
@@ -169,23 +219,31 @@ let stage=0;
 let holdingKnife=false;
 let holdingSlice=false;
 
-const pic2=[...document.querySelectorAll(".float")].find(p=>p.src.includes("pic2.png"));
-pic2.onclick=e=>{e.stopPropagation();overlay.style.display="flex"};
+document.querySelector(".float").onclick=e=>{
+  e.stopPropagation();
+  overlay.style.display="flex";
+};
 
-exit.onclick=()=>{overlay.style.display="none";reset()};
+exit.onclick=()=>{
+  overlay.style.display="none";
+  resetGame();
+};
 
-function reset(){
+function resetGame(){
   stage=0;
   cat.src=frames[0];
-  slice.style.display="none";
   holdingKnife=false;
   holdingSlice=false;
+  slice.style.display="none";
 }
 
 /* knife pickup */
-knife.onmousedown=e=>{holdingKnife=true;e.stopPropagation()};
+knife.onmousedown=e=>{
+  holdingKnife=true;
+  e.stopPropagation();
+};
 
-/* knife follow */
+/* cursor follow */
 overlay.onmousemove=e=>{
   if(holdingKnife){
     knife.style.left=e.clientX-knife.width/2+"px";
@@ -207,24 +265,29 @@ cake.onclick=e=>{
   slice.style.top=e.clientY-slice.height/2+"px";
 };
 
-/* drop slice on cat */
+/* feed */
 overlay.onmouseup=()=>{
   if(!holdingSlice)return;
-  const r1=slice.getBoundingClientRect(),r2=cat.getBoundingClientRect();
+  const r1=slice.getBoundingClientRect();
+  const r2=cat.getBoundingClientRect();
   if(!(r1.right<r2.left||r1.left>r2.right||r1.bottom<r2.top||r1.top>r2.bottom)){
     holdingSlice=false;
     slice.style.display="none";
-    stage++;cat.src=frames[stage]; // eating
+    stage++;
+    cat.src=frames[stage]; /* eating */
   }
 };
 
-/* click cat during eating */
+/* click cat to advance */
 cat.onclick=()=>{
   if(frames[stage].includes("eating")){
     stage++;
     cat.src=frames[stage];
     if(frames[stage]==="cat_done.png"){
-      cat.onclick=()=>{overlay.style.display="none";reset()};
+      cat.onclick=()=>{
+        overlay.style.display="none";
+        resetGame();
+      };
     }
   }
 };
