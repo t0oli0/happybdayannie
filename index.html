@@ -1,290 +1,227 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Happy Birthday Annie</title>
+
 <style>
 html, body {
-  margin: 0; padding: 0;
-  width: 100%; height: 100%;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
   background: #ffd7e8;
   overflow: hidden;
-  font-family: "comic sans ms", cursive !important;
+  font-family: "comic sans ms", cursive;
+}
+
+/* overlay */
+#overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 215, 232, 0.95);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+/* game box */
+#game {
+  position: relative;
+  width: 520px;
+  height: 360px;
+  background: #ffb6d9;
+  border-radius: 18px;
+  box-shadow: 0 0 30px rgba(0,0,0,0.2);
+}
+
+/* exit */
+#exit {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  font-size: 22px;
+  cursor: pointer;
+  color: white;
+}
+
+/* cat */
+#cat {
+  position: absolute;
+  left: 40px;
+  bottom: 40px;
+  width: 180px;
+}
+
+/* cake */
+#cake {
+  position: absolute;
+  right: 110px;
+  bottom: 80px;
+  width: 90px;
   cursor: pointer;
 }
-#app { width:100%; height:100%; position:relative; }
-/* slides */
-.slide { position:absolute; inset:0; display:none; justify-content:center; align-items:center; }
-.slide img { max-width:70%; max-height:70%; }
-/* bow */
-#bow { position:absolute; display:none; justify-content:center; align-items:center; gap:8px; top:50%; left:50%; transform:translate(-50%,-50%); z-index:5; }
-#bow img { width:160px; transition: transform 0.6s ease, opacity 0.6s ease; }
-#bow img:first-child { margin-right:-6px; }
-#bow img:last-child { margin-left:-6px; }
-#bow.untie img:first-child { transform:translateX(-220px) rotate(-20deg); opacity:0; }
-#bow.untie img:last-child { transform:translateX(220px) rotate(20deg); opacity:0; }
-/* door */
-#door { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); cursor:pointer; display:none; z-index:4; max-width:300px; }
-/* main */
-#main { display:none; width:100%; height:100%; position:relative; }
-#title { position:absolute; top:8%; left:50%; transform:translateX(-50%); font-size:3em; color:white; text-shadow:2px 2px 6px #ff9ed9; pointer-events:none; font-family:"comic sans ms", cursive !important; }
-/* floating pics */
-.float { position:absolute; width:90px; animation-name:float; animation-timing-function:ease-in-out; animation-iteration-count:infinite; animation-direction:alternate; cursor:grab; touch-action:none; z-index:1; }
-.float:active { cursor:grabbing; transform:scale(1.08); }
-@keyframes float { from{transform:translateY(0);} to{transform:translateY(-25px);} }
-/* cake overlay */
-#cakeOverlay { display:none; position:absolute; inset:0; background:rgba(255,215,232,0.9); z-index:10; justify-content:center; align-items:center; flex-direction:column; }
-#cakeOverlay img { user-select:none; }
+
+/* knife */
+#knife {
+  position: absolute;
+  right: 40px;
+  bottom: 80px;
+  width: 60px;
+  cursor: pointer;
+}
+
+/* dragging */
+.dragging {
+  pointer-events: none;
+}
 </style>
 </head>
+
 <body>
-<div id="app"></div>
-<!-- audio -->
-<audio id="bowSound" src="ribbon.mp3" preload="auto"></audio>
-<audio id="doorSound" src="doorwow.mp3" preload="auto"></audio>
-<audio id="eatSound" src="eat.mp3" preload="auto"></audio>
+
+<!-- floating image trigger -->
+<img src="pic2.png" id="trigger" style="position:absolute;left:20%;top:30%;width:90px;cursor:pointer">
+
+<!-- game overlay -->
+<div id="overlay">
+  <div id="game">
+    <div id="exit">✕</div>
+
+    <img id="cat" src="cat_standing.png">
+    <img id="cake" src="cake_full.png">
+    <img id="knife" src="knife.png">
+  </div>
+</div>
+
+<audio id="ribbonSound" src="ribbon.mp3"></audio>
+<audio id="eatSound" src="doorwow.mp3"></audio>
+
 <script>
-const app = document.getElementById("app");
-const bowSound = document.getElementById("bowSound");
-const doorSound = document.getElementById("doorSound");
-const eatSound = document.getElementById("eatSound");
+const overlay = document.getElementById("overlay");
+const trigger = document.getElementById("trigger");
+const exitBtn = document.getElementById("exit");
 
-/* slides */
-const slides = ["slide1.png","slide2.png","slide3.png","slide4.png","slide5.png"];
-let slideIndex = 0;
-slides.forEach((src,i)=>{
-  const s=document.createElement("div");
-  s.className="slide";
-  if(i===0)s.style.display="flex";
-  const img=document.createElement("img");
-  img.src=src;
-  s.appendChild(img);
-  app.appendChild(s);
-});
-const slideEls=document.querySelectorAll(".slide");
+const knife = document.getElementById("knife");
+const cake = document.getElementById("cake");
+const cat = document.getElementById("cat");
 
-/* bow */
-const bow=document.createElement("div");
-bow.id="bow";
-bow.innerHTML=`<img src="bowleft.png"><img src="bowright.png">`;
-app.appendChild(bow);
+let holdingKnife = false;
+let cakeSliced = false;
+let holdingCake = false;
+let stage = 0;
 
-/* door */
-const door=document.createElement("img");
-door.id="door";
-door.src="doorclosed.png";
-app.appendChild(door);
-
-/* main */
-const main=document.createElement("div");
-main.id="main";
-main.innerHTML=`<div id="title"></div>`;
-app.appendChild(main);
-
-/* floating images */
-const floatingPics=[
-  "pic2.png","pic3.png","pic4.png","pic5.png","pic6.png","pic7.png",
-  "pic8.png","pic9.png","pic10.png","pic11.png","pic12.png","pic13.png",
-  "pic14.png","pic15.png","pic16.png","pic18.png","pic19.png","pic20.png",
-  "pic21.png","pic22.png","pic23.png","pic24.png","pic25.png","pic26.png",
-  "pic28.png","pic29.png","pic30.png","pic31.png","pic32.png","pic33.png",
-  "pic34.png","pic35.png","pic36.png","pic38.png","pic39.png","pic40.png",
-  "pic41.png","pic42.png","pic43.png","pic44.png","pic45.png"
+const stages = [
+  "cat_eating.png",
+  "cat_fat1_standing.png",
+  "cat_fat1_eating.png",
+  "cat_fat2_standing.png",
+  "cat_fat2_eating.png",
+  "cat_fat3_standing.png",
+  "cat_fat3_eating.png",
+  "cat_done.png"
 ];
-floatingPics.forEach(src=>{
-  const img=document.createElement("img");
-  img.src=src;
-  img.className="float";
-  img.style.left=Math.random()*85+"%";
-  img.style.top=Math.random()*75+"%";
-  img.style.animationDuration=(3+Math.random()*3)+"s";
-  makeDraggable(img);
-  main.appendChild(img);
 
-  if(src==="pic2.png") img.addEventListener("click",()=>startCakeGame());
+/* open game */
+trigger.onclick = () => {
+  overlay.style.display = "flex";
+};
+
+/* exit */
+exitBtn.onclick = () => closeGame();
+
+function closeGame() {
+  overlay.style.display = "none";
+  resetGame();
+}
+
+/* knife logic */
+knife.addEventListener("click", e => {
+  holdingKnife = true;
+  knife.style.opacity = 0.6;
+  e.stopPropagation();
 });
 
-/* drag */
-function makeDraggable(el){
-  let dragging=false,offsetX=0,offsetY=0;
-  const start=(e)=>{
-    dragging=true;
-    const p=e.touches?e.touches[0]:e;
-    offsetX=p.clientX-el.offsetLeft;
-    offsetY=p.clientY-el.offsetTop;
-    el.style.animationPlayState="paused";
-    e.stopPropagation();
-  };
-  const move=(e)=>{
-    if(!dragging) return;
-    const p=e.touches?e.touches[0]:e;
-    el.style.left=p.clientX-offsetX+"px";
-    el.style.top=p.clientY-offsetY+"px";
-  };
-  const end=()=>{
-    dragging=false;
-    el.style.animationPlayState="running";
-  };
-  el.addEventListener("mousedown",start);
-  el.addEventListener("touchstart",start);
-  window.addEventListener("mousemove",move);
-  window.addEventListener("touchmove",move);
-  window.addEventListener("mouseup",end);
-  window.addEventListener("touchend",end);
-}
-
-/* typewriter effect */
-function startTypewriter(){
-  const titleEl=document.getElementById("title");
-  const text="Happy Birthday Annie";
-  let i=0,forward=true;
-  titleEl.textContent="";
-  setInterval(()=>{
-    if(forward){ titleEl.textContent+=text[i]; i++; if(i>=text.length)forward=false; }
-    else{ titleEl.textContent=text.substring(0,i); i--; if(i<=0)forward=true; }
-  },150);
-}
-
-/* slide progression */
-let mainPageShown=false;
-document.body.addEventListener("click",()=>{
-  if(mainPageShown) return;
-  if(slideIndex<slides.length-1){
-    slideEls[slideIndex].style.display="none";
-    slideIndex++;
-    slideEls[slideIndex].style.display="flex";
-    return;
-  }
-  if(slideIndex===slides.length-1 && bow.style.display!=="flex"){
-    slideEls[slideIndex].style.display="none";
-    bow.style.display="flex";
-    door.style.display="block";
-    return;
+/* right click puts knife down */
+document.addEventListener("contextmenu", e => {
+  if (holdingKnife) {
+    e.preventDefault();
+    holdingKnife = false;
+    knife.style.opacity = 1;
   }
 });
 
-/* bow click */
-bow.addEventListener("click",(e)=>{
+/* cake click (slice only if knife held) */
+cake.addEventListener("click", e => {
+  if (!cakeSliced && holdingKnife) {
+    cakeSliced = true;
+    holdingKnife = false;
+    cake.src = "cake_slice.png";
+    knife.style.opacity = 1;
+  }
   e.stopPropagation();
-  bowSound.currentTime=0; bowSound.play();
-  bow.classList.add("untie");
-  setTimeout(()=>{ bow.style.display="none"; },700);
 });
 
-/* door click */
-door.addEventListener("click",(e)=>{
-  e.stopPropagation();
-  if(mainPageShown) return;
-  doorSound.currentTime=0; doorSound.play();
-  door.src="dooropen.png";
-  setTimeout(()=>{
-    door.style.display="none";
-    main.style.display="block";
-    mainPageShown=true;
-    startTypewriter();
-  },1000);
+/* drag cake only after sliced */
+cake.addEventListener("mousedown", e => {
+  if (!cakeSliced) return;
+  holdingCake = true;
+  cake.classList.add("dragging");
 });
 
-/* knife right-click to put down */
-document.addEventListener("contextmenu",(e)=>{
-  e.preventDefault();
-  const knife=document.querySelector("#cakeOverlay img[src='knife.png']");
-  if(knife && knife.style.display!=="none"){ knife.style.display="none"; knifePicked=false; }
+document.addEventListener("mousemove", e => {
+  if (!holdingCake) return;
+  cake.style.left = e.clientX - 40 + "px";
+  cake.style.top = e.clientY - 40 + "px";
 });
 
-/* ---------------- Cake mini-game ---------------- */
-function startCakeGame(){
-  const overlay=document.createElement("div");
-  overlay.id="cakeOverlay";
-  overlay.style.display="flex";
-  overlay.style.justifyContent="center";
-  overlay.style.alignItems="center";
-  overlay.style.flexDirection="column";
-  overlay.style.background="rgba(255,215,232,0.9)";
-  overlay.style.position="absolute";
-  overlay.style.inset="0";
-  overlay.style.zIndex="10";
-  document.body.appendChild(overlay);
+document.addEventListener("mouseup", e => {
+  if (!holdingCake) return;
+  holdingCake = false;
+  cake.classList.remove("dragging");
 
-  const cake=document.createElement("img");
-  cake.id="cake"; cake.src="cake_full.png"; cake.style.width="100px"; cake.style.cursor="pointer";
-  cake.style.position="absolute"; cake.style.left="50%"; cake.style.top="50%"; cake.style.transform="translate(-50%,-50%)";
-  overlay.appendChild(cake);
+  const catBox = cat.getBoundingClientRect();
+  const cakeBox = cake.getBoundingClientRect();
 
-  const cat=document.createElement("img");
-  cat.id="cat"; cat.src="cat_standing.png"; cat.style.position="absolute"; cat.style.bottom="60px";
-  cat.style.left="50%"; cat.style.transform="translateX(-50%)"; cat.style.width="200px";
-  overlay.appendChild(cat);
+  const overlap =
+    cakeBox.left < catBox.right &&
+    cakeBox.right > catBox.left &&
+    cakeBox.top < catBox.bottom &&
+    cakeBox.bottom > catBox.top;
 
-  const knife=document.createElement("img");
-  knife.src="knife.png"; knife.style.width="60px"; knife.style.position="absolute"; knife.style.left="calc(50% - 150px)"; knife.style.top="50%"; knife.style.transform="translateY(-50%)";
-  knife.style.display="block"; knife.style.pointerEvents="none"; knife.style.zIndex="11";
-  overlay.appendChild(knife);
+  if (overlap) advanceCat();
+});
 
-  let knifePicked=false;
-  let cakeHeld=false;
-  let catStage=0;
-  const catSequence=[
-    "cat_standing.png","cat_eating.png",
-    "cat_fat1_standing.png","cat_fat1_eating.png",
-    "cat_fat2_standing.png","cat_fat2_eating.png",
-    "cat_fat3_standing.png","cat_fat3_eating.png",
-    "cat_done.png"
-  ];
+/* cat progression */
+function advanceCat() {
+  if (stage >= stages.length) return;
 
-  // pick up knife
-  overlay.addEventListener("click",(e)=>{
-    if(!knifePicked && e.target===overlay){
-      knifePicked=true; knife.style.pointerEvents="auto";
-    }
-  });
+  cat.src = stages[stage];
+  document.getElementById("eatSound").play();
+  stage++;
 
-  // knife follows mouse if picked up
-  overlay.addEventListener("mousemove",(e)=>{
-    if(knifePicked){
-      knife.style.left=e.clientX-30+"px";
-      knife.style.top=e.clientY-10+"px";
-    }
-  });
+  if (stage === stages.length) {
+    cat.onclick = closeGame;
+  }
+}
 
-  // click cake with knife to slice
-  cake.addEventListener("click",(e)=>{
-    e.stopPropagation();
-    if(!knifePicked) return;
-    cake.src="cake_slice.png";
-    cakeHeld=true; // player can drag cake to cat
-  });
+/* reset */
+function resetGame() {
+  holdingKnife = false;
+  cakeSliced = false;
+  holdingCake = false;
+  stage = 0;
 
-  // drag cake if held
-  cake.addEventListener("mousedown",(e)=>{
-    if(!cakeHeld) return;
-    let offsetX=e.clientX-cake.offsetLeft, offsetY=e.clientY-cake.offsetTop;
-    const move=(ev)=>{
-      cake.style.left=ev.clientX-offsetX+"px";
-      cake.style.top=ev.clientY-offsetY+"px";
-    };
-    const up=()=>{
-      window.removeEventListener("mousemove",move);
-      window.removeEventListener("mouseup",up);
-    };
-    window.addEventListener("mousemove",move);
-    window.addEventListener("mouseup",up);
-  });
+  cat.src = "cat_standing.png";
+  cake.src = "cake_full.png";
+  knife.style.opacity = 1;
 
-  // click cat only if cake held over it
-  cat.addEventListener("click",(e)=>{
-    if(!cakeHeld) return;
-    catStage++; if(catStage>=catSequence.length) catStage=catSequence.length-1;
-    cat.src=catSequence[catStage]; eatSound.currentTime=0; eatSound.play();
-    cakeHeld=false; cake.src="cake_full.png"; // reset cake
-
-    if(catStage===catSequence.length-1){
-      knife.style.display="none";
-      overlay.addEventListener("click",()=>{ document.body.removeChild(overlay); },{once:true});
-    }
-  });
+  cake.style.right = "110px";
+  cake.style.bottom = "80px";
 }
 </script>
+
 </body>
 </html>
