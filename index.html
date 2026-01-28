@@ -3,177 +3,77 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>happy birthday annie</title>
+<title>Happy Birthday Annie</title>
 
 <style>
-html, body {
-  margin:0;
-  padding:0;
-  width:100%;
-  height:100%;
-  background:#ffd7e8;
-  overflow:hidden;
-  font-family:"comic sans ms", cursive;
-  cursor:pointer;
+html,body{
+  margin:0;padding:0;width:100%;height:100%;
+  background:#ffd7e8;overflow:hidden;
+  font-family:"Comic Sans MS",cursive;cursor:pointer;
 }
-
-#app {
-  width:100%;
-  height:100%;
-  position:relative;
-}
+#app{width:100%;height:100%;position:relative;}
 
 /* slides */
-.slide {
-  position:absolute;
-  inset:0;
-  display:none;
-  justify-content:center;
-  align-items:center;
-}
-.slide img {
-  max-width:70%;
-  max-height:70%;
-}
+.slide{position:absolute;inset:0;display:none;justify-content:center;align-items:center;}
+.slide img{max-width:70%;max-height:70%;}
 
-/* bow on door */
-#bow {
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%, -50%);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  gap:8px;
-  z-index:5;
+/* bow */
+#bow{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  display:none;justify-content:center;align-items:center;gap:8px;z-index:5;
 }
-#bow img {
-  width:160px;
-  transition:transform 0.6s ease, opacity 0.6s ease;
-}
-#bow img:first-child {
-  margin-right:-6px;
-}
-#bow img:last-child {
-  margin-left:-6px;
-}
-#bow.untie img:first-child {
-  transform:translateX(-220px) rotate(-20deg);
-  opacity:0;
-}
-#bow.untie img:last-child {
-  transform:translateX(220px) rotate(20deg);
-  opacity:0;
-}
+#bow img{width:160px;transition:transform .6s ease,opacity .6s ease;}
+#bow img:first-child{margin-right:-6px;}
+#bow img:last-child{margin-left:-6px;}
+#bow.untie img:first-child{transform:translateX(-220px) rotate(-20deg);opacity:0;}
+#bow.untie img:last-child{transform:translateX(220px) rotate(20deg);opacity:0;}
 
 /* door */
-#door {
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%, -50%);
-  display:none;
-  max-width:300px;
-  cursor:pointer;
-  z-index:4;
+#door{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  display:none;max-width:300px;cursor:pointer;z-index:4;
 }
 
 /* main */
-#main {
-  display:none;
-  width:100%;
-  height:100%;
-  position:relative;
-}
-#title {
-  position:absolute;
-  top:8%;
-  left:50%;
-  transform:translateX(-50%);
-  font-size:3em;
-  color:white;
-  text-shadow:2px 2px 6px #ff9ed9;
+#main{display:none;width:100%;height:100%;position:relative;}
+#title{
+  position:absolute;top:8%;left:50%;transform:translateX(-50%);
+  font-size:3em;color:white;text-shadow:2px 2px 6px #ff9ed9;
   pointer-events:none;
-  font-family:"comic sans ms", cursive;
 }
 
-/* floating pics */
-.float {
-  position:absolute;
-  width:90px;
-  animation:float 4s ease-in-out infinite alternate;
-  cursor:grab;
-  z-index:1;
+/* floating */
+.float{
+  position:absolute;width:90px;animation:float 4s ease-in-out infinite alternate;
+  cursor:grab;z-index:1;
 }
-.float:active {
-  cursor:grabbing;
-  transform:scale(1.08);
-}
-@keyframes float {
-  from { transform:translateY(0); }
-  to { transform:translateY(-25px); }
-}
+.float:active{cursor:grabbing;transform:scale(1.08);}
+@keyframes float{from{transform:translateY(0);}to{transform:translateY(-25px);}}
 
-/* mini-game overlay */
-#catGameOverlay {
-  display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(255,215,232,0.92);
-  z-index:999;
-  justify-content:center;
-  align-items:center;
-  font-family:"comic sans ms", cursive;
+/* game overlay */
+#catGameOverlay{
+  display:none;position:fixed;inset:0;background:rgba(255,215,232,0.92);
+  z-index:999;justify-content:center;align-items:center;font-family:"Comic Sans MS",cursive;
 }
-#catGame {
-  position:relative;
-  width:520px;
-  height:360px;
-  background:#ffb6d9;
-  border-radius:14px;
+#catGame{
+  position:relative;width:520px;height:360px;background:#ffb6d9;border-radius:14px;
   box-shadow:0 0 28px rgba(0,0,0,0.2);
 }
-#catExit {
-  position:absolute;
-  top:8px;
-  right:12px;
-  cursor:pointer;
-  color:white;
-  font-size:22px;
-  font-weight:bold;
-}
-#catSprite {
-  position:absolute;
-  left:40px;
-  bottom:40px;
-  width:180px;
-}
-#cakeSprite {
-  position:absolute;
-  right:110px;
-  bottom:80px;
-  width:90px;
-  cursor:pointer;
-}
-#knifeSprite {
-  position:absolute;
-  right:40px;
-  bottom:80px;
-  width:60px;
-  cursor:pointer;
-}
+#catExit{position:absolute;top:8px;right:12px;cursor:pointer;color:white;font-size:22px;font-weight:bold;}
+#catSprite{position:absolute;left:40px;bottom:40px;width:180px;}
+#cakeSprite{position:absolute;right:110px;bottom:80px;width:90px;cursor:pointer;}
+#knifeSprite{position:absolute;right:40px;bottom:80px;width:60px;cursor:pointer;}
 </style>
 </head>
 
 <body>
 <div id="app"></div>
 
-<!-- audio -->
 <audio id="ribbonSound" src="ribbon.mp3" preload="auto"></audio>
 <audio id="doorSound" src="doorwow.mp3" preload="auto"></audio>
 
-<!-- mini-game overlay -->
 <div id="catGameOverlay">
   <div id="catGame">
     <div id="catExit">✕</div>
@@ -184,24 +84,19 @@ html, body {
 </div>
 
 <script>
-const app = document.getElementById("app");
-const ribbonSound = document.getElementById("ribbonSound");
-const doorSound = document.getElementById("doorSound");
+const app=document.getElementById("app");
+const ribbonSound=document.getElementById("ribbonSound");
+const doorSound=document.getElementById("doorSound");
 
 /* slides */
-const slides = ["slide1.png","slide2.png","slide3.png","slide4.png","slide5.png"];
-let slideIndex = 0;
-
+const slides=["slide1.png","slide2.png","slide3.png","slide4.png","slide5.png"];
+let slideIndex=0;
 slides.forEach((src,i)=>{
-  const div=document.createElement("div");
-  div.className="slide";
-  if(i===0) div.style.display="flex";
-  const img=document.createElement("img");
-  img.src=src;
-  div.appendChild(img);
-  app.appendChild(div);
+  const d=document.createElement("div");
+  d.className="slide";
+  if(i===0)d.style.display="flex";
+  const img=document.createElement("img");img.src=src;d.appendChild(img);app.appendChild(d);
 });
-
 const slideEls=document.querySelectorAll(".slide");
 
 /* bow */
@@ -212,126 +107,99 @@ app.appendChild(bow);
 
 /* door */
 const door=document.createElement("img");
-door.id="door";
-door.src="doorclosed.png";
-app.appendChild(door);
+door.id="door";door.src="doorclosed.png";app.appendChild(door);
 
 /* main */
 const main=document.createElement("div");
-main.id="main";
-main.innerHTML=`<div id="title"></div>`;
-app.appendChild(main);
+main.id="main";main.innerHTML=`<div id="title"></div>`;app.appendChild(main);
 
-/* floating images */
+/* floating pics */
 const floatingPics=[
-  "pic2.png","pic3.png","pic4.png","pic5.png","pic6.png","pic7.png",
-  "pic8.png","pic9.png","pic10.png","pic11.png","pic12.png","pic13.png",
-  "pic14.png","pic15.png","pic16.png","pic18.png","pic19.png","pic20.png",
-  "pic21.png","pic22.png","pic23.png","pic24.png","pic25.png","pic26.png",
-  "pic28.png","pic29.png","pic30.png","pic31.png","pic32.png","pic33.png",
-  "pic34.png","pic35.png","pic36.png","pic38.png","pic39.png","pic40.png",
+  "pic2.png","pic3.png","pic4.png","pic5.png","pic6.png","pic7.png","pic8.png","pic9.png","pic10.png",
+  "pic11.png","pic12.png","pic13.png","pic14.png","pic15.png","pic16.png","pic18.png","pic19.png","pic20.png",
+  "pic21.png","pic22.png","pic23.png","pic24.png","pic25.png","pic26.png","pic28.png","pic29.png","pic30.png",
+  "pic31.png","pic32.png","pic33.png","pic34.png","pic35.png","pic36.png","pic38.png","pic39.png","pic40.png",
   "pic41.png","pic42.png","pic43.png","pic44.png","pic45.png"
 ];
 
 floatingPics.forEach(src=>{
   const img=document.createElement("img");
-  img.src=src;
-  img.className="float";
+  img.src=src;img.className="float";
   img.style.left=Math.random()*85+"%";
   img.style.top=Math.random()*75+"%";
   img.style.animationDuration=(3+Math.random()*3)+"s";
-  makeDraggable(img);
+  makeDrag(img);
   main.appendChild(img);
 });
 
-/* draggable */
-function makeDraggable(el){
-  let dragging=false,offsetX=0,offsetY=0;
+/* drag */
+function makeDrag(el){
+  let drag=false,ox=0,oy=0;
   el.addEventListener("mousedown",e=>{
-    dragging=true;
-    offsetX=e.clientX-el.offsetLeft;
-    offsetY=e.clientY-el.offsetTop;
-    el.style.animationPlayState="paused";
-    e.stopPropagation();
+    drag=true;ox=e.clientX-el.offsetLeft;oy=e.clientY-el.offsetTop;
+    el.style.animationPlayState="paused";e.stopPropagation();
   });
   window.addEventListener("mousemove",e=>{
-    if(!dragging)return;
-    el.style.left=e.clientX-offsetX+"px";
-    el.style.top=e.clientY-offsetY+"px";
+    if(!drag)return;el.style.left=e.clientX-ox+"px";el.style.top=e.clientY-oy+"px";
   });
-  window.addEventListener("mouseup",()=>dragging=false);
+  window.addEventListener("mouseup",()=>drag=false);
 }
 
 /* typewriter */
-function startTypewriter(){
+function startType(){
   const title=document.getElementById("title");
   const text="Happy Birthday Annie";
-  let i=0,forward=true;
-  title.textContent="";
+  let i=0,fwd=true;
   setInterval(()=>{
-    if(forward){
-      title.textContent+=text[i++];
-      if(i>=text.length) forward=false;
-    } else {
-      title.textContent=text.substring(0,--i);
-      if(i<=0) forward=true;
-    }
+    if(fwd){title.textContent=text.slice(0,++i);if(i>=text.length)fwd=false;}
+    else{title.textContent=text.slice(0,--i);if(i<=0)fwd=true;}
   },150);
 }
 
 /* progression */
 let mainShown=false;
 document.body.addEventListener("click",()=>{
-  if(mainShown) return;
+  if(mainShown)return;
   if(slideIndex<slides.length-1){
     slideEls[slideIndex].style.display="none";
-    slideIndex++;
-    slideEls[slideIndex].style.display="flex";
-    return;
+    slideIndex++;slideEls[slideIndex].style.display="flex";return;
   }
   if(slideIndex===slides.length-1 && bow.style.display!=="flex"){
     slideEls[slideIndex].style.display="none";
-    bow.style.display="flex";
-    door.style.display="block";
-    return;
+    bow.style.display="flex";door.style.display="block";return;
   }
 });
 
-/* bow click */
+/* bow */
 bow.addEventListener("click",e=>{
   e.stopPropagation();
-  ribbonSound.currentTime=0;
-  ribbonSound.play();
+  ribbonSound.currentTime=0;ribbonSound.play();
   bow.classList.add("untie");
-  setTimeout(()=>{ bow.style.display="none"; },700);
+  setTimeout(()=>bow.style.display="none",700);
 });
 
-/* door click */
+/* door */
 door.addEventListener("click",e=>{
-  e.stopPropagation();
-  if(mainShown) return;
-  doorSound.currentTime=0;
-  doorSound.play();
+  e.stopPropagation();if(mainShown)return;
+  doorSound.currentTime=0;doorSound.play();
   door.src="dooropen.png";
   setTimeout(()=>{
-    door.style.display="none";
-    main.style.display="block";
-    mainShown=true;
-    startTypewriter();
+    door.style.display="none";main.style.display="block";mainShown=true;startType();
   },1000);
 });
 
-/* === CAT MINI-GAME === */
-const catGameOverlay=document.getElementById("catGameOverlay");
+/* === CAT GAME === */
+const overlay=document.getElementById("catGameOverlay");
 const catExit=document.getElementById("catExit");
-const catSprite=document.getElementById("catSprite");
-const cakeSprite=document.getElementById("cakeSprite");
-const knifeSprite=document.getElementById("knifeSprite");
+const cat=document.getElementById("catSprite");
+const cake=document.getElementById("cakeSprite");
+const knife=document.getElementById("knifeSprite");
 
 let holdingKnife=false;
 let cakeSliced=false;
 let holdingCake=false;
 let catStage=0;
+let cakeUsedOnce=false;
 
 const catFrames=[
   "cat_eating.png",
@@ -344,111 +212,96 @@ const catFrames=[
   "cat_done.png"
 ];
 
-const pic2=[...document.querySelectorAll(".float")].find(el=>el.src.includes("pic2.png"));
-if(pic2) pic2.addEventListener("click",e=>{
-  e.stopPropagation();
-  catGameOverlay.style.display="flex";
+const pic2=[...document.querySelectorAll(".float")].find(e=>e.src.includes("pic2.png"));
+if(pic2)pic2.addEventListener("click",e=>{
+  e.stopPropagation();overlay.style.display="flex";
 });
 
 /* exit */
-catExit.addEventListener("click", closeCatGame);
+catExit.onclick=closeGame;
+function closeGame(){overlay.style.display="none";resetGame();}
 
-function closeCatGame(){
-  catGameOverlay.style.display="none";
-  resetCatGame();
-}
-
-function resetCatGame(){
-  holdingKnife=false;
-  cakeSliced=false;
-  holdingCake=false;
-  catStage=0;
-  catSprite.src="cat_standing.png";
-  cakeSprite.src="cake_full.png";
-  cakeSprite.style.left="";
-  cakeSprite.style.top="";
-  knifeSprite.style.opacity="1";
-  knifeSprite.style.left="";
-  knifeSprite.style.top="";
-  knifeSprite.style.right="40px";
-  knifeSprite.style.bottom="80px";
+/* reset */
+function resetGame(){
+  holdingKnife=false;cakeSliced=false;holdingCake=false;cakeUsedOnce=false;catStage=0;
+  cat.src="cat_standing.png";
+  cake.src="cake_full.png";cake.style.left="";cake.style.top="";
+  knife.style.opacity="1";knife.style.left="";knife.style.top="";
+  knife.style.right="40px";knife.style.bottom="80px";
 }
 
 /* knife pickup */
-knifeSprite.addEventListener("click", e=>{
-  e.stopPropagation();
-  holdingKnife=true;
-  knifeSprite.style.opacity="0.6";
+knife.addEventListener("click",e=>{
+  e.stopPropagation();holdingKnife=true;knife.style.opacity="0.6";
 });
 
-/* right click = put down */
-catGameOverlay.addEventListener("contextmenu", e=>{
-  e.preventDefault();
-  holdingKnife=false;
-  knifeSprite.style.opacity="1";
+/* right click = drop */
+overlay.addEventListener("contextmenu",e=>{
+  e.preventDefault();holdingKnife=false;knife.style.opacity="1";
 });
 
-/* knife follows cursor */
-catGameOverlay.addEventListener("mousemove", e=>{
+/* knife follow */
+overlay.addEventListener("mousemove",e=>{
   if(!holdingKnife)return;
-  knifeSprite.style.left=(e.clientX-30)+"px";
-  knifeSprite.style.top=(e.clientY-10)+"px";
+  knife.style.left=(e.clientX-10)+"px";
+  knife.style.top=(e.clientY-10)+"px";
 });
 
-/* slice cake */
-cakeSprite.addEventListener("click", e=>{
+/* slice cake once */
+cake.addEventListener("click",e=>{
   if(!holdingKnife)return;
   e.stopPropagation();
-  cakeSprite.src="cake_slice.png";
-  cakeSliced=true;
-  holdingCake=true;
-  holdingKnife=false;
-  knifeSprite.style.opacity="1";
+  cake.src="cake_slice.png";
+  cakeSliced=true;holdingCake=true;holdingKnife=false;
+  knife.style.opacity="1";
 });
 
 /* drag cake */
-cakeSprite.addEventListener("mousedown", e=>{
-  if(!cakeSliced)return;
-  holdingCake=true;
+cake.addEventListener("mousedown",e=>{
+  if(!cakeSliced)return;holdingCake=true;
 });
-
-document.addEventListener("mousemove", e=>{
+document.addEventListener("mousemove",e=>{
   if(!holdingCake)return;
-  cakeSprite.style.left=(e.clientX-40)+"px";
-  cakeSprite.style.top=(e.clientY-40)+"px";
+  cake.style.left=(e.clientX-20)+"px";
+  cake.style.top=(e.clientY-20)+"px";
 });
-
-document.addEventListener("mouseup", e=>{
+document.addEventListener("mouseup",e=>{
   if(!holdingCake)return;
-  holdingCake=false;
-  checkCatCollision();
+  holdingCake=false;checkFeed();
 });
 
-function checkCatCollision(){
-  const c1=catSprite.getBoundingClientRect();
-  const c2=cakeSprite.getBoundingClientRect();
-  const overlap =
-    c2.left<c1.right &&
-    c2.right>c1.left &&
-    c2.top<c1.bottom &&
-    c2.bottom>c1.top;
-  if(overlap) feedCat();
+/* feed */
+function checkFeed(){
+  const r1=cat.getBoundingClientRect(),r2=cake.getBoundingClientRect();
+  if(r2.left<r1.right && r2.right>r1.left && r2.top<r1.bottom && r2.bottom>r1.top){
+    feedCat();
+  }
 }
 
 function feedCat(){
-  if(catStage>=catFrames.length)return;
+  if(cakeUsedOnce){
+    return; // no repeat slices
+  }
+  cakeUsedOnce=true;
   setTimeout(()=>{
-    catSprite.src=catFrames[catStage];
-    catStage++;
+    cat.src=catFrames[catStage++]; // eating
+    setTimeout(()=>cat.src=catFrames[catStage++],250); // fat1 standing
     cakeSliced=false;
-    cakeSprite.src="cake_full.png";
-    cakeSprite.style.left="";
-    cakeSprite.style.top="";
-    if(catStage===catFrames.length){
-      catSprite.onclick=()=>closeCatGame();
-    }
+    cake.src="cake_full.png";
+    cake.style.left="";cake.style.top="";
   },250);
 }
+
+/* cat click advances after first slice */
+cat.addEventListener("click",()=>{
+  if(!cakeUsedOnce)return; // first feed needed
+  if(catStage<catFrames.length){
+    setTimeout(()=>cat.src=catFrames[catStage++],250);
+    if(catStage===catFrames.length){
+      cat.onclick=()=>closeGame();
+    }
+  }
+});
 </script>
 </body>
 </html>
