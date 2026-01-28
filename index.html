@@ -44,12 +44,20 @@ html, body {
   display: none;
   justify-content: center;
   align-items: center;
-  gap: 40px;
+  gap: 8px; /* tighter */
 }
 
 #bow img {
   width: 160px;
   transition: transform 0.6s ease, opacity 0.6s ease;
+}
+
+#bow img:first-child {
+  margin-right: -6px;
+}
+
+#bow img:last-child {
+  margin-left: -6px;
 }
 
 #bow.untie img:first-child {
@@ -105,10 +113,13 @@ html, body {
 <body>
 <div id="app"></div>
 
+<audio id="bowSound" src="bow.mp3" preload="auto"></audio>
+
 <script>
 const app = document.getElementById("app");
+const bowSound = document.getElementById("bowSound");
 
-/* ---------- intro slides ---------- */
+/* slides */
 const slides = [
   "slide1.png",
   "slide2.png",
@@ -133,7 +144,7 @@ slides.forEach((src, i) => {
 
 const slideEls = document.querySelectorAll(".slide");
 
-/* ---------- bow ---------- */
+/* bow */
 const bow = document.createElement("div");
 bow.id = "bow";
 bow.innerHTML = `
@@ -142,7 +153,7 @@ bow.innerHTML = `
 `;
 app.appendChild(bow);
 
-/* ---------- main page ---------- */
+/* main */
 const main = document.createElement("div");
 main.id = "main";
 main.innerHTML = `<div id="title">happy birthday annie</div>`;
@@ -170,7 +181,7 @@ floatingPics.forEach(src => {
   main.appendChild(img);
 });
 
-/* ---------- drag logic ---------- */
+/* drag */
 function makeDraggable(el) {
   let dragging = false;
   let offsetX = 0;
@@ -205,7 +216,7 @@ function makeDraggable(el) {
   window.addEventListener("touchend", end);
 }
 
-/* ---------- click progression ---------- */
+/* progression */
 document.body.addEventListener("click", () => {
   if (slideIndex < slides.length - 1) {
     slideEls[slideIndex].style.display = "none";
@@ -224,6 +235,8 @@ document.body.addEventListener("click", () => {
 /* bow click */
 bow.addEventListener("click", (e) => {
   e.stopPropagation();
+  bowSound.currentTime = 0;
+  bowSound.play();
   bow.classList.add("untie");
 
   setTimeout(() => {
