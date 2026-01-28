@@ -78,6 +78,7 @@ html, body {
   font-size: 3em;
   color: white;
   text-shadow: 2px 2px 6px #ff9ed9;
+  pointer-events: none;
 }
 
 /* floating pics */
@@ -85,6 +86,13 @@ html, body {
   position: absolute;
   width: 90px;
   animation: float 4s ease-in-out infinite alternate;
+  cursor: grab;
+  touch-action: none;
+}
+
+.float:active {
+  cursor: grabbing;
+  transform: scale(1.08);
 }
 
 @keyframes float {
@@ -140,7 +148,7 @@ main.id = "main";
 main.innerHTML = `<div id="title">happy birthday annie</div>`;
 app.appendChild(main);
 
-/* floating images list (exactly what you uploaded) */
+/* floating images */
 const floatingPics = [
   "pic2.png","pic3.png","pic4.png","pic5.png","pic6.png","pic7.png",
   "pic8.png","pic9.png","pic10.png","pic11.png","pic12.png","pic13.png",
@@ -155,15 +163,50 @@ floatingPics.forEach(src => {
   const img = document.createElement("img");
   img.src = src;
   img.className = "float";
-  img.style.left = Math.random() * 90 + "%";
-  img.style.top = Math.random() * 80 + "%";
+  img.style.left = Math.random() * 85 + "%";
+  img.style.top = Math.random() * 75 + "%";
   img.style.animationDuration = 3 + Math.random() * 3 + "s";
+  makeDraggable(img);
   main.appendChild(img);
 });
 
-/* ---------- click logic ---------- */
+/* ---------- drag logic ---------- */
+function makeDraggable(el) {
+  let dragging = false;
+  let offsetX = 0;
+  let offsetY = 0;
+
+  const start = (e) => {
+    dragging = true;
+    const p = e.touches ? e.touches[0] : e;
+    offsetX = p.clientX - el.offsetLeft;
+    offsetY = p.clientY - el.offsetTop;
+    el.style.animationPlayState = "paused";
+    e.stopPropagation();
+  };
+
+  const move = (e) => {
+    if (!dragging) return;
+    const p = e.touches ? e.touches[0] : e;
+    el.style.left = p.clientX - offsetX + "px";
+    el.style.top = p.clientY - offsetY + "px";
+  };
+
+  const end = () => {
+    dragging = false;
+    el.style.animationPlayState = "running";
+  };
+
+  el.addEventListener("mousedown", start);
+  el.addEventListener("touchstart", start);
+  window.addEventListener("mousemove", move);
+  window.addEventListener("touchmove", move);
+  window.addEventListener("mouseup", end);
+  window.addEventListener("touchend", end);
+}
+
+/* ---------- click progression ---------- */
 document.body.addEventListener("click", () => {
-  // slides
   if (slideIndex < slides.length - 1) {
     slideEls[slideIndex].style.display = "none";
     slideIndex++;
@@ -171,7 +214,6 @@ document.body.addEventListener("click", () => {
     return;
   }
 
-  // show bow
   if (slideIndex === slides.length - 1 && bow.style.display !== "flex") {
     slideEls[slideIndex].style.display = "none";
     bow.style.display = "flex";
