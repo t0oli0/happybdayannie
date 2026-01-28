@@ -1,122 +1,100 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Happy Birthday Annie</title>
+/* --------------------- Cake mini-game --------------------- */
+function startCakeGame() {
+  const overlay = document.createElement("div");
+  overlay.id = "cakeOverlay";
+  overlay.style.display = "flex";
+  overlay.style.justifyContent = "center";
+  overlay.style.alignItems = "center";
+  overlay.style.flexDirection = "column";
+  overlay.style.background = "rgba(255,215,232,0.9)";
+  overlay.style.position = "absolute";
+  overlay.style.inset = "0";
+  overlay.style.zIndex = "10";
+  document.body.appendChild(overlay);
 
-<style>
-html, body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  background: #ffd7e8;
-  overflow: hidden;
-  font-family: "comic sans ms", cursive !important;
-  cursor: pointer;
+  // Cake image
+  const cake = document.createElement("img");
+  cake.id = "cake";
+  cake.src = "cake_full.png";
+  cake.style.width = "120px"; // smaller cake
+  cake.style.cursor = "pointer";
+  overlay.appendChild(cake);
+
+  // Cat image
+  const cat = document.createElement("img");
+  cat.id = "cat";
+  cat.src = "cat_standing.png";
+  cat.style.position = "absolute";
+  cat.style.bottom = "60px";
+  cat.style.left = "50%";
+  cat.style.transform = "translateX(-50%)";
+  cat.style.width = "200px"; // bigger cat
+  overlay.appendChild(cat);
+
+  // Knife image
+  const knife = document.createElement("img");
+  knife.src = "knife.png";
+  knife.style.width = "60px";
+  knife.style.position = "absolute";
+  knife.style.display = "none"; // initially hidden
+  knife.style.pointerEvents = "none"; // let it follow mouse
+  knife.style.zIndex = "11";
+  overlay.appendChild(knife);
+
+  let knifePicked = false;
+  let catStage = 0;
+  const catSequence = [
+    "cat_standing.png","cat_eating.png",
+    "cat_fat1_standing.png","cat_fat1_eating.png",
+    "cat_fat2_standing.png","cat_fat2_eating.png",
+    "cat_fat3_standing.png","cat_fat3_eating.png",
+    "cat_done.png"
+  ];
+
+  // Pick up knife by clicking anywhere on overlay
+  overlay.addEventListener("click", (e) => {
+    if (!knifePicked && e.target === overlay) {
+      knifePicked = true;
+      knife.style.display = "block";
+      knife.style.left = e.clientX + "px";
+      knife.style.top = e.clientY + "px";
+    }
+  });
+
+  // Knife follows mouse
+  overlay.addEventListener("mousemove", (e) => {
+    if (knifePicked) {
+      knife.style.left = e.clientX - 30 + "px"; // center knife
+      knife.style.top = e.clientY - 10 + "px";
+    }
+  });
+
+  // Click on cake to slice
+  cake.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (!knifePicked) return;
+    cake.src = "cake_slice.png";
+  });
+
+  // Click on cat to feed
+  cat.addEventListener("click", () => {
+    if (!knifePicked) return;
+    catStage++;
+    if (catStage >= catSequence.length) catStage = catSequence.length - 1;
+    cat.src = catSequence[catStage];
+    eatSound.currentTime = 0;
+    eatSound.play();
+
+    // Reset knife for next slice if not done
+    if (catStage < catSequence.length - 1) {
+      knifePicked = true;
+      cake.src = "cake_full.png";
+    } else {
+      // final cat_done click to exit
+      knife.style.display = "none";
+      overlay.addEventListener("click", () => {
+        document.body.removeChild(overlay);
+      }, { once: true });
+    }
+  });
 }
-
-#app {
-  width: 100%;
-  height: 100%;
-  position: relative;
-}
-
-/* slides */
-.slide {
-  position: absolute;
-  inset: 0;
-  display: none;
-  justify-content: center;
-  align-items: center;
-}
-
-.slide img {
-  max-width: 70%;
-  max-height: 70%;
-}
-
-/* bow */
-#bow {
-  position: absolute;
-  display: none;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 5;
-}
-
-#bow img {
-  width: 160px;
-  transition: transform 0.6s ease, opacity 0.6s ease;
-}
-
-#bow img:first-child { margin-right: -6px; }
-#bow img:last-child { margin-left: -6px; }
-
-#bow.untie img:first-child {
-  transform: translateX(-220px) rotate(-20deg);
-  opacity: 0;
-}
-
-#bow.untie img:last-child {
-  transform: translateX(220px) rotate(20deg);
-  opacity: 0;
-}
-
-/* door */
-#door {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  cursor: pointer;
-  display: none;
-  z-index: 4;
-  max-width: 300px;
-}
-
-/* main page */
-#main {
-  display: none;
-  width: 100%;
-  height: 100%;
-  position: relative;
-}
-
-#title {
-  position: absolute;
-  top: 8%;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 3em;
-  color: white;
-  text-shadow: 2px 2px 6px #ff9ed9;
-  pointer-events: none;
-  font-family: "comic sans ms", cursive !important;
-}
-
-/* floating pics */
-.float {
-  position: absolute;
-  width: 90px;
-  animation-name: float;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-  animation-direction: alternate;
-  cursor: grab;
-  touch-action: none;
-  z-index: 1;
-}
-
-.float:active {
-  cursor: grabbing;
-  transform: scale(1.08);
-}
-
-@keyframes float {
-  from { transform: translate
