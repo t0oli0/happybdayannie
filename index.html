@@ -305,4 +305,10 @@ function startCakeGame(){
       knifePicked=true; cake.src="cake_full.png";
     } else {
       knife.style.display="none";
-      overlay.addEventListener("click",()=>{ document.body.removeChi
+      overlay.addEventListener("click",()=>{ document.body.removeChild(overlay); },{once:true});
+    }
+  });
+}
+</script>
+</body>
+</html>
