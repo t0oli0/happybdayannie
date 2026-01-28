@@ -6,99 +6,44 @@
 <title>Happy Birthday Annie</title>
 <style>
 html, body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
+  margin: 0; padding: 0;
+  width: 100%; height: 100%;
   background: #ffd7e8;
   overflow: hidden;
   font-family: "comic sans ms", cursive !important;
   cursor: pointer;
 }
-
 #app { width:100%; height:100%; position:relative; }
-
 /* slides */
-.slide {
-  position: absolute;
-  inset: 0;
-  display: none;
-  justify-content: center;
-  align-items: center;
-}
+.slide { position:absolute; inset:0; display:none; justify-content:center; align-items:center; }
 .slide img { max-width:70%; max-height:70%; }
-
 /* bow */
-#bow {
-  position: absolute;
-  display: none;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%,-50%);
-  z-index: 5;
-}
+#bow { position:absolute; display:none; justify-content:center; align-items:center; gap:8px; top:50%; left:50%; transform:translate(-50%,-50%); z-index:5; }
 #bow img { width:160px; transition: transform 0.6s ease, opacity 0.6s ease; }
 #bow img:first-child { margin-right:-6px; }
 #bow img:last-child { margin-left:-6px; }
 #bow.untie img:first-child { transform:translateX(-220px) rotate(-20deg); opacity:0; }
 #bow.untie img:last-child { transform:translateX(220px) rotate(20deg); opacity:0; }
-
 /* door */
 #door { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); cursor:pointer; display:none; z-index:4; max-width:300px; }
-
 /* main */
 #main { display:none; width:100%; height:100%; position:relative; }
-#title {
-  position:absolute;
-  top:8%;
-  left:50%;
-  transform:translateX(-50%);
-  font-size:3em;
-  color:white;
-  text-shadow:2px 2px 6px #ff9ed9;
-  pointer-events:none;
-  font-family:"comic sans ms", cursive !important;
-}
-
+#title { position:absolute; top:8%; left:50%; transform:translateX(-50%); font-size:3em; color:white; text-shadow:2px 2px 6px #ff9ed9; pointer-events:none; font-family:"comic sans ms", cursive !important; }
 /* floating pics */
-.float {
-  position:absolute;
-  width:90px;
-  animation-name: float;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-  animation-direction: alternate;
-  cursor: grab;
-  touch-action: none;
-  z-index:1;
-}
+.float { position:absolute; width:90px; animation-name:float; animation-timing-function:ease-in-out; animation-iteration-count:infinite; animation-direction:alternate; cursor:grab; touch-action:none; z-index:1; }
 .float:active { cursor:grabbing; transform:scale(1.08); }
 @keyframes float { from{transform:translateY(0);} to{transform:translateY(-25px);} }
-
-/* cake mini-game overlay */
-#cakeOverlay {
-  display:none;
-  position:absolute;
-  inset:0;
-  background:rgba(255,215,232,0.9);
-  z-index:10;
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-}
+/* cake overlay */
+#cakeOverlay { display:none; position:absolute; inset:0; background:rgba(255,215,232,0.9); z-index:10; justify-content:center; align-items:center; flex-direction:column; }
+#cakeOverlay img { user-select:none; }
 </style>
 </head>
 <body>
 <div id="app"></div>
-
 <!-- audio -->
 <audio id="bowSound" src="ribbon.mp3" preload="auto"></audio>
 <audio id="doorSound" src="doorwow.mp3" preload="auto"></audio>
 <audio id="eatSound" src="eat.mp3" preload="auto"></audio>
-
 <script>
 const app = document.getElementById("app");
 const bowSound = document.getElementById("bowSound");
@@ -157,7 +102,6 @@ floatingPics.forEach(src=>{
   makeDraggable(img);
   main.appendChild(img);
 
-  // cake mini-game trigger
   if(src==="pic2.png") img.addEventListener("click",()=>startCakeGame());
 });
 
@@ -242,6 +186,13 @@ door.addEventListener("click",(e)=>{
   },1000);
 });
 
+/* knife right-click to put down */
+document.addEventListener("contextmenu",(e)=>{
+  e.preventDefault();
+  const knife=document.querySelector("#cakeOverlay img[src='knife.png']");
+  if(knife && knife.style.display!=="none"){ knife.style.display="none"; knifePicked=false; }
+});
+
 /* ---------------- Cake mini-game ---------------- */
 function startCakeGame(){
   const overlay=document.createElement("div");
@@ -258,6 +209,7 @@ function startCakeGame(){
 
   const cake=document.createElement("img");
   cake.id="cake"; cake.src="cake_full.png"; cake.style.width="100px"; cake.style.cursor="pointer";
+  cake.style.position="absolute"; cake.style.left="50%"; cake.style.top="50%"; cake.style.transform="translate(-50%,-50%)";
   overlay.appendChild(cake);
 
   const cat=document.createElement("img");
@@ -266,11 +218,12 @@ function startCakeGame(){
   overlay.appendChild(cat);
 
   const knife=document.createElement("img");
-  knife.src="knife.png"; knife.style.width="60px"; knife.style.position="absolute"; knife.style.display="none";
-  knife.style.pointerEvents="none"; knife.style.zIndex="11";
+  knife.src="knife.png"; knife.style.width="60px"; knife.style.position="absolute"; knife.style.left="calc(50% - 150px)"; knife.style.top="50%"; knife.style.transform="translateY(-50%)";
+  knife.style.display="block"; knife.style.pointerEvents="none"; knife.style.zIndex="11";
   overlay.appendChild(knife);
 
   let knifePicked=false;
+  let cakeHeld=false;
   let catStage=0;
   const catSequence=[
     "cat_standing.png","cat_eating.png",
@@ -282,28 +235,51 @@ function startCakeGame(){
 
   // pick up knife
   overlay.addEventListener("click",(e)=>{
-    if(!knifePicked && e.target===overlay){ knifePicked=true; knife.style.display="block"; knife.style.left=e.clientX+"px"; knife.style.top=e.clientY+"px"; }
+    if(!knifePicked && e.target===overlay){
+      knifePicked=true; knife.style.pointerEvents="auto";
+    }
   });
 
+  // knife follows mouse if picked up
   overlay.addEventListener("mousemove",(e)=>{
-    if(knifePicked){ knife.style.left=e.clientX-30+"px"; knife.style.top=e.clientY-10+"px"; }
+    if(knifePicked){
+      knife.style.left=e.clientX-30+"px";
+      knife.style.top=e.clientY-10+"px";
+    }
   });
 
-  // click cake to slice
+  // click cake with knife to slice
   cake.addEventListener("click",(e)=>{
-    e.stopPropagation(); if(!knifePicked) return;
+    e.stopPropagation();
+    if(!knifePicked) return;
     cake.src="cake_slice.png";
+    cakeHeld=true; // player can drag cake to cat
   });
 
-  // click cat to feed
-  cat.addEventListener("click",()=>{
-    if(!knifePicked) return;
+  // drag cake if held
+  cake.addEventListener("mousedown",(e)=>{
+    if(!cakeHeld) return;
+    let offsetX=e.clientX-cake.offsetLeft, offsetY=e.clientY-cake.offsetTop;
+    const move=(ev)=>{
+      cake.style.left=ev.clientX-offsetX+"px";
+      cake.style.top=ev.clientY-offsetY+"px";
+    };
+    const up=()=>{
+      window.removeEventListener("mousemove",move);
+      window.removeEventListener("mouseup",up);
+    };
+    window.addEventListener("mousemove",move);
+    window.addEventListener("mouseup",up);
+  });
+
+  // click cat only if cake held over it
+  cat.addEventListener("click",(e)=>{
+    if(!cakeHeld) return;
     catStage++; if(catStage>=catSequence.length) catStage=catSequence.length-1;
     cat.src=catSequence[catStage]; eatSound.currentTime=0; eatSound.play();
+    cakeHeld=false; cake.src="cake_full.png"; // reset cake
 
-    if(catStage<catSequence.length-1){
-      knifePicked=true; cake.src="cake_full.png";
-    } else {
+    if(catStage===catSequence.length-1){
       knife.style.display="none";
       overlay.addEventListener("click",()=>{ document.body.removeChild(overlay); },{once:true});
     }
