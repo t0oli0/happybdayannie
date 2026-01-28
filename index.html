@@ -36,7 +36,7 @@ html,body{
   display:none;max-width:300px;cursor:pointer;z-index:4;
 }
 
-/* main */
+/* main page */
 #main{display:none;width:100%;height:100%;position:relative;}
 #title{
   position:absolute;top:8%;left:50%;transform:translateX(-50%);
@@ -44,7 +44,7 @@ html,body{
   pointer-events:none;
 }
 
-/* floating */
+/* floating pics */
 .float{
   position:absolute;width:90px;animation:float 4s ease-in-out infinite alternate;
   cursor:grab;z-index:1;
@@ -52,7 +52,7 @@ html,body{
 .float:active{cursor:grabbing;transform:scale(1.08);}
 @keyframes float{from{transform:translateY(0);}to{transform:translateY(-25px);}}
 
-/* game overlay */
+/* cat game */
 #catGameOverlay{
   display:none;position:fixed;inset:0;background:rgba(255,215,232,0.92);
   z-index:999;justify-content:center;align-items:center;font-family:"Comic Sans MS",cursive;
@@ -64,6 +64,7 @@ html,body{
 #catExit{position:absolute;top:8px;right:12px;cursor:pointer;color:white;font-size:22px;font-weight:bold;}
 #catSprite{position:absolute;left:40px;bottom:40px;width:180px;}
 #cakeSprite{position:absolute;right:110px;bottom:80px;width:90px;cursor:pointer;}
+#sliceSprite{position:absolute;display:none;width:90px;cursor:pointer;}
 #knifeSprite{position:absolute;right:40px;bottom:80px;width:60px;cursor:pointer;}
 </style>
 </head>
@@ -79,11 +80,13 @@ html,body{
     <div id="catExit">✕</div>
     <img id="catSprite" src="cat_standing.png">
     <img id="cakeSprite" src="cake_full.png">
+    <img id="sliceSprite" src="cake_slice.png">
     <img id="knifeSprite" src="knife.png">
   </div>
 </div>
 
 <script>
+/* ===== BASE FLOW ===== */
 const app=document.getElementById("app");
 const ribbonSound=document.getElementById("ribbonSound");
 const doorSound=document.getElementById("doorSound");
@@ -93,16 +96,15 @@ const slides=["slide1.png","slide2.png","slide3.png","slide4.png","slide5.png"];
 let slideIndex=0;
 slides.forEach((src,i)=>{
   const d=document.createElement("div");
-  d.className="slide";
-  if(i===0)d.style.display="flex";
-  const img=document.createElement("img");img.src=src;d.appendChild(img);app.appendChild(d);
+  d.className="slide";if(i===0)d.style.display="flex";
+  const img=document.createElement("img");img.src=src;
+  d.appendChild(img);app.appendChild(d);
 });
 const slideEls=document.querySelectorAll(".slide");
 
 /* bow */
 const bow=document.createElement("div");
-bow.id="bow";
-bow.innerHTML=`<img src="bowleft.png"><img src="bowright.png">`;
+bow.id="bow";bow.innerHTML=`<img src="bowleft.png"><img src="bowright.png">`;
 app.appendChild(bow);
 
 /* door */
@@ -113,13 +115,13 @@ door.id="door";door.src="doorclosed.png";app.appendChild(door);
 const main=document.createElement("div");
 main.id="main";main.innerHTML=`<div id="title"></div>`;app.appendChild(main);
 
-/* floating pics */
+/* floating */
 const floatingPics=[
-  "pic2.png","pic3.png","pic4.png","pic5.png","pic6.png","pic7.png","pic8.png","pic9.png","pic10.png",
-  "pic11.png","pic12.png","pic13.png","pic14.png","pic15.png","pic16.png","pic18.png","pic19.png","pic20.png",
-  "pic21.png","pic22.png","pic23.png","pic24.png","pic25.png","pic26.png","pic28.png","pic29.png","pic30.png",
-  "pic31.png","pic32.png","pic33.png","pic34.png","pic35.png","pic36.png","pic38.png","pic39.png","pic40.png",
-  "pic41.png","pic42.png","pic43.png","pic44.png","pic45.png"
+"pic2.png","pic3.png","pic4.png","pic5.png","pic6.png","pic7.png","pic8.png","pic9.png","pic10.png",
+"pic11.png","pic12.png","pic13.png","pic14.png","pic15.png","pic16.png","pic18.png","pic19.png","pic20.png",
+"pic21.png","pic22.png","pic23.png","pic24.png","pic25.png","pic26.png","pic28.png","pic29.png","pic30.png",
+"pic31.png","pic32.png","pic33.png","pic34.png","pic35.png","pic36.png","pic38.png","pic39.png","pic40.png",
+"pic41.png","pic42.png","pic43.png","pic44.png","pic45.png"
 ];
 
 floatingPics.forEach(src=>{
@@ -128,25 +130,26 @@ floatingPics.forEach(src=>{
   img.style.left=Math.random()*85+"%";
   img.style.top=Math.random()*75+"%";
   img.style.animationDuration=(3+Math.random()*3)+"s";
-  makeDrag(img);
+  dragImg(img);
   main.appendChild(img);
 });
 
-/* drag */
-function makeDrag(el){
+/* drag function */
+function dragImg(el){
   let drag=false,ox=0,oy=0;
   el.addEventListener("mousedown",e=>{
     drag=true;ox=e.clientX-el.offsetLeft;oy=e.clientY-el.offsetTop;
     el.style.animationPlayState="paused";e.stopPropagation();
   });
   window.addEventListener("mousemove",e=>{
-    if(!drag)return;el.style.left=e.clientX-ox+"px";el.style.top=e.clientY-oy+"px";
+    if(!drag)return;
+    el.style.left=e.clientX-ox+"px";el.style.top=e.clientY-oy+"px";
   });
   window.addEventListener("mouseup",()=>drag=false);
 }
 
 /* typewriter */
-function startType(){
+function type(){
   const title=document.getElementById("title");
   const text="Happy Birthday Annie";
   let i=0,fwd=true;
@@ -170,7 +173,7 @@ document.body.addEventListener("click",()=>{
   }
 });
 
-/* bow */
+/* bow click */
 bow.addEventListener("click",e=>{
   e.stopPropagation();
   ribbonSound.currentTime=0;ribbonSound.play();
@@ -178,130 +181,121 @@ bow.addEventListener("click",e=>{
   setTimeout(()=>bow.style.display="none",700);
 });
 
-/* door */
+/* door click */
 door.addEventListener("click",e=>{
   e.stopPropagation();if(mainShown)return;
   doorSound.currentTime=0;doorSound.play();
   door.src="dooropen.png";
   setTimeout(()=>{
-    door.style.display="none";main.style.display="block";mainShown=true;startType();
+    door.style.display="none";main.style.display="block";mainShown=true;type();
   },1000);
 });
 
-/* === CAT GAME === */
+/* ===== CAT GAME ===== */
 const overlay=document.getElementById("catGameOverlay");
-const catExit=document.getElementById("catExit");
+const exitBtn=document.getElementById("catExit");
 const cat=document.getElementById("catSprite");
 const cake=document.getElementById("cakeSprite");
+const slice=document.getElementById("sliceSprite");
 const knife=document.getElementById("knifeSprite");
 
 let holdingKnife=false;
-let cakeSliced=false;
-let holdingCake=false;
+let draggingSlice=false;
+let firstFeed=false;
 let catStage=0;
-let cakeUsedOnce=false;
 
-const catFrames=[
-  "cat_eating.png",
-  "cat_fat1_standing.png",
-  "cat_fat1_eating.png",
-  "cat_fat2_standing.png",
-  "cat_fat2_eating.png",
-  "cat_fat3_standing.png",
-  "cat_fat3_eating.png",
-  "cat_done.png"
+const frames=[
+"cat_eating.png","cat_fat1_standing.png","cat_fat1_eating.png",
+"cat_fat2_standing.png","cat_fat2_eating.png",
+"cat_fat3_standing.png","cat_fat3_eating.png","cat_done.png"
 ];
 
 const pic2=[...document.querySelectorAll(".float")].find(e=>e.src.includes("pic2.png"));
 if(pic2)pic2.addEventListener("click",e=>{
-  e.stopPropagation();overlay.style.display="flex";
+  e.stopPropagation();
+  overlay.style.display="flex";
 });
 
 /* exit */
-catExit.onclick=closeGame;
-function closeGame(){overlay.style.display="none";resetGame();}
+exitBtn.onclick=()=>{overlay.style.display="none";resetGame();};
 
-/* reset */
 function resetGame(){
-  holdingKnife=false;cakeSliced=false;holdingCake=false;cakeUsedOnce=false;catStage=0;
+  holdingKnife=false;draggingSlice=false;firstFeed=false;catStage=0;
   cat.src="cat_standing.png";
-  cake.src="cake_full.png";cake.style.left="";cake.style.top="";
-  knife.style.opacity="1";knife.style.left="";knife.style.top="";
-  knife.style.right="40px";knife.style.bottom="80px";
+  cake.style.display="block";slice.style.display="none";
+  knife.style.display="block";
 }
 
 /* knife pickup */
-knife.addEventListener("click",e=>{
-  e.stopPropagation();holdingKnife=true;knife.style.opacity="0.6";
+knife.addEventListener("mousedown",e=>{
+  e.stopPropagation();holdingKnife=true;
 });
 
-/* right click = drop */
+/* right click drop */
 overlay.addEventListener("contextmenu",e=>{
-  e.preventDefault();holdingKnife=false;knife.style.opacity="1";
+  e.preventDefault();holdingKnife=false;
 });
 
 /* knife follow */
 overlay.addEventListener("mousemove",e=>{
   if(!holdingKnife)return;
-  knife.style.left=(e.clientX-10)+"px";
-  knife.style.top=(e.clientY-10)+"px";
+  knife.style.left=(e.clientX-knife.width/2)+"px";
+  knife.style.top=(e.clientY-knife.height/2)+"px";
 });
 
 /* slice cake once */
 cake.addEventListener("click",e=>{
   if(!holdingKnife)return;
   e.stopPropagation();
-  cake.src="cake_slice.png";
-  cakeSliced=true;holdingCake=true;holdingKnife=false;
-  knife.style.opacity="1";
+  holdingKnife=false;
+  knife.style.display="none";
+  cake.style.display="none";
+  slice.style.display="block";
+  slice.style.left=e.clientX-slice.width/2+"px";
+  slice.style.top=e.clientY-slice.height/2+"px";
+  draggingSlice=true;
 });
 
-/* drag cake */
-cake.addEventListener("mousedown",e=>{
-  if(!cakeSliced)return;holdingCake=true;
-});
-document.addEventListener("mousemove",e=>{
-  if(!holdingCake)return;
-  cake.style.left=(e.clientX-20)+"px";
-  cake.style.top=(e.clientY-20)+"px";
-});
-document.addEventListener("mouseup",e=>{
-  if(!holdingCake)return;
-  holdingCake=false;checkFeed();
+/* drag slice */
+overlay.addEventListener("mousemove",e=>{
+  if(!draggingSlice)return;
+  slice.style.left=(e.clientX-slice.width/2)+"px";
+  slice.style.top=(e.clientY-slice.height/2)+"px";
 });
 
-/* feed */
-function checkFeed(){
-  const r1=cat.getBoundingClientRect(),r2=cake.getBoundingClientRect();
-  if(r2.left<r1.right && r2.right>r1.left && r2.top<r1.bottom && r2.bottom>r1.top){
-    feedCat();
-  }
-}
+/* drop on cat */
+overlay.addEventListener("mouseup",e=>{
+  if(!draggingSlice)return;
+  draggingSlice=false;
+  if(hit(slice,cat)) firstFeeding();
+});
 
-function feedCat(){
-  if(cakeUsedOnce){
-    return; // no repeat slices
-  }
-  cakeUsedOnce=true;
+/* first feeding */
+function firstFeeding(){
+  firstFeed=true;
+  slice.style.display="none";
   setTimeout(()=>{
-    cat.src=catFrames[catStage++]; // eating
-    setTimeout(()=>cat.src=catFrames[catStage++],250); // fat1 standing
-    cakeSliced=false;
-    cake.src="cake_full.png";
-    cake.style.left="";cake.style.top="";
+    cat.src=frames[catStage++];       // eating
+    setTimeout(()=>cat.src=frames[catStage++],250); // fat1 standing
   },250);
 }
 
-/* cat click advances after first slice */
+/* click cat to progress */
 cat.addEventListener("click",()=>{
-  if(!cakeUsedOnce)return; // first feed needed
-  if(catStage<catFrames.length){
-    setTimeout(()=>cat.src=catFrames[catStage++],250);
-    if(catStage===catFrames.length){
-      cat.onclick=()=>closeGame();
+  if(!firstFeed)return;
+  if(catStage<frames.length){
+    setTimeout(()=>cat.src=frames[catStage++],250);
+    if(catStage===frames.length){
+      cat.onclick=()=>{overlay.style.display="none";resetGame();};
     }
   }
 });
+
+/* collision */
+function hit(a,b){
+  const r1=a.getBoundingClientRect(),r2=b.getBoundingClientRect();
+  return !(r1.right<r2.left||r1.left>r2.right||r1.bottom<r2.top||r1.top>r2.bottom);
+}
 </script>
 </body>
 </html>
