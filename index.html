@@ -97,7 +97,6 @@ html,body{
 </div>
 
 <script>
-/* ---------- base ---------- */
 const app=document.getElementById("app");
 const ribbonSound=document.getElementById("ribbonSound");
 const doorSound=document.getElementById("doorSound");
@@ -153,7 +152,6 @@ pics.forEach(src=>{
   if(src==="pic2.png") pic2El=img;
 });
 
-/* draggable */
 function makeDraggable(el){
   let dragging=false,ox=0,oy=0;
   el.addEventListener("mousedown",e=>{
@@ -168,7 +166,6 @@ function makeDraggable(el){
   window.addEventListener("mouseup",()=>dragging=false);
 }
 
-/* typewriter */
 function typewriter(){
   const t=document.getElementById("title");
   const text="Happy Birthday Annie";
@@ -180,7 +177,6 @@ function typewriter(){
   },150);
 }
 
-/* progression */
 let mainShown=false;
 document.body.onclick=()=>{
   if(mainShown)return;
@@ -229,13 +225,11 @@ let stage=0;
 let holdingKnife=false;
 let holdingSlice=false;
 
-/* open game */
 pic2El.addEventListener("click",e=>{
   e.stopPropagation();
   overlay.style.display="flex";
 });
 
-/* exit */
 exit.onclick=()=>{
   overlay.style.display="none";
   resetGame();
@@ -245,27 +239,28 @@ function resetGame(){
   stage=0; cat.src=frames[0];
   holdingKnife=false; holdingSlice=false;
   slice.style.display="none";
+  knife.style.pointerEvents="auto";
   knife.style.left=""; knife.style.top="";
   knife.style.right="40px"; knife.style.bottom="80px";
 }
 
-/* helper: mouse -> game coords */
 function toGameCoords(e){
   const r=game.getBoundingClientRect();
   return { x:e.clientX-r.left, y:e.clientY-r.top };
 }
 
-/* knife pickup (FIXED) */
+/* knife pickup */
 knife.onmousedown=e=>{
   const p=toGameCoords(e);
   holdingKnife=true;
+  knife.style.pointerEvents="none"; /* 🔑 FIX */
   knife.style.right="auto"; knife.style.bottom="auto";
   knife.style.left=p.x-knife.width/2+"px";
   knife.style.top=p.y-knife.height/2+"px";
   e.stopPropagation();
 };
 
-/* follow cursor (FIXED) */
+/* follow cursor */
 overlay.onmousemove=e=>{
   const p=toGameCoords(e);
   if(holdingKnife){
@@ -278,11 +273,13 @@ overlay.onmousemove=e=>{
   }
 };
 
-/* slice cake (FIXED) */
+/* slice cake */
 cake.onclick=e=>{
   if(!holdingKnife)return;
   const p=toGameCoords(e);
-  holdingKnife=false; holdingSlice=true;
+  holdingKnife=false;
+  holdingSlice=true;
+  knife.style.pointerEvents="auto";
   slice.style.display="block";
   slice.style.left=p.x-slice.width/2+"px";
   slice.style.top=p.y-slice.height/2+"px";
