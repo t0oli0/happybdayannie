@@ -81,7 +81,7 @@ html,body{
 }
 
 /* letter */
-.letterFinal{ transform:translateY(-24%); }
+.letterFinal{transform:translateY(-24%)}
 
 /* feeding game */
 #game{
@@ -89,16 +89,14 @@ html,body{
   background:#ffb6d9;border-radius:14px
 }
 #cat{position:absolute;left:40px;bottom:40px;width:180px}
-#cake{position:absolute;right:110px;bottom:80px;width:90px}
-#knife{position:absolute;right:40px;bottom:80px;width:60px}
+#cake{position:absolute;right:110px;bottom:80px;width:90px;cursor:pointer}
+#knife{position:absolute;right:40px;bottom:80px;width:60px;cursor:pointer}
 #slice{position:absolute;width:90px;display:none;pointer-events:none}
 
 /* maze */
 #mazeBox{
   width:520px;height:520px;
-  background:#ffc4df;
-  border-radius:16px;
-  position:relative;
+  background:#ffc4df;border-radius:16px;position:relative
 }
 .wall{position:absolute;background:#ff8fc7}
 #player{position:absolute;width:36px;height:36px}
@@ -107,9 +105,7 @@ html,body{
   background:#fff;border-radius:50%;
   right:20px;bottom:20px
 }
-#mazeVideo{
-  display:none;position:absolute;inset:0;background:black
-}
+#mazeVideo{display:none;position:absolute;inset:0;background:black}
 #mazeVideo video{width:100%;height:100%;object-fit:cover}
 </style>
 </head>
@@ -135,7 +131,7 @@ html,body{
 <div id="letterOverlay" class="overlay">
   <div class="overlayContent">
     <div class="closeBtn" id="letterExit">✕</div>
-    <img id="letterImg" src="">
+    <img id="letterImg">
   </div>
 </div>
 
@@ -193,6 +189,23 @@ main.id="main";
 main.innerHTML=`<div id="title">Happy Birthday Annie</div>`;
 app.appendChild(main);
 
+/* ---------- DRAGGABLE (SAFE) ---------- */
+function makeDraggable(el){
+  let dragging=false,ox=0,oy=0;
+  el.addEventListener("mousedown",e=>{
+    dragging=true;
+    ox=e.clientX-el.offsetLeft;
+    oy=e.clientY-el.offsetTop;
+    e.stopPropagation();
+  });
+  document.addEventListener("mousemove",e=>{
+    if(!dragging)return;
+    el.style.left=e.clientX-ox+"px";
+    el.style.top=e.clientY-oy+"px";
+  });
+  document.addEventListener("mouseup",()=>dragging=false);
+}
+
 /* ---------- FLOATING IMAGES ---------- */
 const pics=[
 "pic2.png","pic3.png","pic4.png","pic5.png","pic6.png","pic7.png","pic8.png","pic9.png","pic10.png",
@@ -202,7 +215,7 @@ const pics=[
 "pic41.png","pic42.png","pic43.png","pic44.png","pic45.png"
 ];
 
-let pic2El=null,pic3El=null,pic41El=null;
+let pic2El,pic3El,pic41El;
 
 pics.forEach(src=>{
   const img=document.createElement("img");
@@ -212,27 +225,12 @@ pics.forEach(src=>{
   img.style.top=Math.random()*75+"%";
   main.appendChild(img);
   makeDraggable(img);
-
-  if(src==="pic2.png") pic2El=img;
-  if(src==="pic3.png") pic3El=img;
-  if(src==="pic41.png") pic41El=img;
+  if(src==="pic2.png")pic2El=img;
+  if(src==="pic3.png")pic3El=img;
+  if(src==="pic41.png")pic41El=img;
 });
 
-function makeDraggable(el){
-  let d=false,ox=0,oy=0;
-  el.onmousedown=e=>{
-    d=true;ox=e.clientX-el.offsetLeft;oy=e.clientY-el.offsetTop;
-    e.stopPropagation();
-  };
-  window.onmousemove=e=>{
-    if(!d)return;
-    el.style.left=e.clientX-ox+"px";
-    el.style.top=e.clientY-oy+"px";
-  };
-  window.onmouseup=()=>d=false;
-}
-
-/* flow */
+/* ---------- FLOW ---------- */
 let mainShown=false;
 document.body.onclick=()=>{
   if(mainShown)return;
@@ -267,7 +265,7 @@ door.onclick=e=>{
 /* ---------- CAKE GAME ---------- */
 const feedOverlay=document.getElementById("feedOverlay");
 const feedExit=document.getElementById("feedExit");
-pic2El.onclick=e=>{e.stopPropagation();feedOverlay.style.display="flex";};
+pic2El.onclick=e=>{e.stopPropagation();feedOverlay.style.display="flex"};
 feedExit.onclick=()=>feedOverlay.style.display="none";
 
 /* ---------- LETTER ---------- */
