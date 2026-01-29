@@ -7,60 +7,110 @@
 
 <style>
 html,body{
-  margin:0;padding:0;width:100%;height:100%;
-  background:#ffd7e8;overflow:hidden;
+  margin:0;
+  padding:0;
+  width:100%;
+  height:100%;
+  background:#ffd7e8;
+  overflow:hidden;
   font-family:"Comic Sans MS",cursive;
 }
-#app{width:100%;height:100%;position:relative}
 
-/* slides */
-.slide{position:absolute;inset:0;display:none;justify-content:center;align-items:center}
-.slide img{max-width:70%;max-height:70%}
+#app{
+  width:100%;
+  height:100%;
+  position:relative;
+}
 
-/* bow */
+/* ---------- SLIDES ---------- */
+.slide{
+  position:absolute;
+  inset:0;
+  display:none;
+  justify-content:center;
+  align-items:center;
+}
+.slide img{
+  max-width:70%;
+  max-height:70%;
+}
+
+/* ---------- BOW ---------- */
 #bow{
-  position:absolute;top:50%;left:50%;
+  position:absolute;
+  top:50%;
+  left:50%;
   transform:translate(-50%,-50%);
-  display:none;gap:8px;z-index:5
+  display:none;
+  gap:8px;
+  z-index:5;
 }
-#bow img{width:160px;transition:.6s}
-#bow img:first-child{margin-right:-6px}
-#bow img:last-child{margin-left:-6px}
-#bow.untie img:first-child{transform:translateX(-220px) rotate(-20deg);opacity:0}
-#bow.untie img:last-child{transform:translateX(220px) rotate(20deg);opacity:0}
+#bow img{
+  width:160px;
+  transition:0.6s;
+}
+#bow img:first-child{ margin-right:-6px; }
+#bow img:last-child{ margin-left:-6px; }
 
-/* door */
+#bow.untie img:first-child{
+  transform:translateX(-220px) rotate(-20deg);
+  opacity:0;
+}
+#bow.untie img:last-child{
+  transform:translateX(220px) rotate(20deg);
+  opacity:0;
+}
+
+/* ---------- DOOR ---------- */
 #door{
-  position:absolute;top:50%;left:50%;
+  position:absolute;
+  top:50%;
+  left:50%;
   transform:translate(-50%,-50%);
-  display:none;max-width:300px;z-index:4
+  display:none;
+  max-width:300px;
+  z-index:4;
 }
 
-/* main */
-#main{display:none;width:100%;height:100%;position:relative}
+/* ---------- MAIN ---------- */
+#main{
+  display:none;
+  width:100%;
+  height:100%;
+  position:relative;
+}
 #title{
-  position:absolute;top:8%;left:50%;
+  position:absolute;
+  top:8%;
+  left:50%;
   transform:translateX(-50%);
-  font-size:3em;color:white;
-  text-shadow:2px 2px 6px #ff9ed9
+  font-size:3em;
+  color:white;
+  text-shadow:2px 2px 6px #ff9ed9;
 }
 
-/* floating images */
+/* ---------- FLOATING IMAGES ---------- */
 .float{
-  position:absolute;width:90px;
+  position:absolute;
+  width:90px;
   animation:float 4s ease-in-out infinite alternate;
-  cursor:grab;user-select:none
+  cursor:grab;
+  user-select:none;
 }
-@keyframes float{from{transform:translateY(0)}to{transform:translateY(-25px)}}
+@keyframes float{
+  from{ transform:translateY(0); }
+  to{ transform:translateY(-25px); }
+}
 
-/* overlays */
+/* ---------- OVERLAYS ---------- */
 .overlay{
   display:none;
-  position:fixed;inset:0;
+  position:fixed;
+  inset:0;
   background:rgba(255,215,232,.92);
   z-index:999;
   justify-content:center;
-  align-items:center
+  align-items:center;
 }
 .overlayContent{
   position:relative;
@@ -72,17 +122,14 @@ html,body{
   max-height:100%;
 }
 
-/* 🎯 adjusted height for bunny_letter6 */
-.letterFinal{
-  transform: translateY(-28%);
-}
-
 .closeBtn{
   position:absolute;
-  top:-10px;right:-10px;
+  top:-10px;
+  right:-10px;
   background:#ff9ed9;
   color:white;
-  width:32px;height:32px;
+  width:32px;
+  height:32px;
   border-radius:50%;
   text-align:center;
   line-height:32px;
@@ -90,15 +137,22 @@ html,body{
   cursor:pointer;
 }
 
-/* feeding game */
-#game{
-  width:520px;height:360px;
-  background:#ffb6d9;border-radius:14px
+/* ---------- LETTER FINAL POSITION ---------- */
+.letterFinal{
+  transform:translateY(-24%);
 }
-#cat{position:absolute;left:40px;bottom:40px;width:180px}
-#cake{position:absolute;right:110px;bottom:80px;width:90px}
-#knife{position:absolute;right:40px;bottom:80px;width:60px}
-#slice{position:absolute;width:90px;display:none;pointer-events:none}
+
+/* ---------- FEEDING GAME ---------- */
+#game{
+  width:520px;
+  height:360px;
+  background:#ffb6d9;
+  border-radius:14px;
+}
+#cat{ position:absolute; left:40px; bottom:40px; width:180px; }
+#cake{ position:absolute; right:110px; bottom:80px; width:90px; }
+#knife{ position:absolute; right:40px; bottom:80px; width:60px; }
+#slice{ position:absolute; width:90px; display:none; pointer-events:none; }
 </style>
 </head>
 
@@ -107,6 +161,17 @@ html,body{
 
 <audio id="ribbonSound" src="ribbon.mp3"></audio>
 <audio id="doorSound" src="doorwow.mp3"></audio>
+
+<!-- FEEDING GAME OVERLAY -->
+<div id="feedOverlay" class="overlay">
+  <div id="game" class="overlayContent">
+    <div class="closeBtn" id="feedExit">✕</div>
+    <img id="cat" src="cat_standing.png">
+    <img id="cake" src="cake_full.png">
+    <img id="knife" src="knife.png">
+    <img id="slice" src="cake_slice.png">
+  </div>
+</div>
 
 <!-- LETTER OVERLAY -->
 <div id="letterOverlay" class="overlay">
@@ -117,28 +182,147 @@ html,body{
 </div>
 
 <script>
-/* letter logic (unchanged) */
+/* ---------- SLIDES ---------- */
+const app = document.getElementById("app");
+const slides = ["slide1.png","slide2.png","slide3.png","slide4.png","slide5.png"];
+let slideIndex = 0;
+
+slides.forEach((src,i)=>{
+  const d = document.createElement("div");
+  d.className = "slide";
+  if(i===0) d.style.display="flex";
+  const img = document.createElement("img");
+  img.src = src;
+  d.appendChild(img);
+  app.appendChild(d);
+});
+const slideEls = document.querySelectorAll(".slide");
+
+/* ---------- BOW + DOOR ---------- */
+const bow = document.createElement("div");
+bow.id = "bow";
+bow.innerHTML = `<img src="bowleft.png"><img src="bowright.png">`;
+app.appendChild(bow);
+
+const door = document.createElement("img");
+door.id = "door";
+door.src = "doorclosed.png";
+app.appendChild(door);
+
+/* ---------- MAIN ---------- */
+const main = document.createElement("div");
+main.id = "main";
+main.innerHTML = `<div id="title"></div>`;
+app.appendChild(main);
+
+/* ---------- FLOATING IMAGES ---------- */
+const pics = [
+"pic2.png","pic3.png","pic4.png","pic5.png","pic6.png","pic7.png","pic8.png","pic9.png","pic10.png",
+"pic11.png","pic12.png","pic13.png","pic14.png","pic15.png","pic16.png","pic18.png","pic19.png","pic20.png",
+"pic21.png","pic22.png","pic23.png","pic24.png","pic25.png","pic26.png","pic28.png","pic29.png","pic30.png",
+"pic31.png","pic32.png","pic33.png","pic34.png","pic35.png","pic36.png","pic38.png","pic39.png","pic40.png",
+"pic41.png","pic42.png","pic43.png","pic44.png","pic45.png"
+];
+
+let pic2El=null, pic41El=null;
+
+pics.forEach(src=>{
+  const img=document.createElement("img");
+  img.src=src;
+  img.className="float";
+  img.style.left=Math.random()*85+"%";
+  img.style.top=Math.random()*75+"%";
+  main.appendChild(img);
+  makeDraggable(img);
+  if(src==="pic2.png") pic2El=img;
+  if(src==="pic41.png") pic41El=img;
+});
+
+function makeDraggable(el){
+  let d=false,ox=0,oy=0;
+  el.addEventListener("mousedown",e=>{
+    d=true;
+    ox=e.clientX-el.offsetLeft;
+    oy=e.clientY-el.offsetTop;
+    e.stopPropagation();
+  });
+  window.addEventListener("mousemove",e=>{
+    if(!d) return;
+    el.style.left=e.clientX-ox+"px";
+    el.style.top=e.clientY-oy+"px";
+  });
+  window.addEventListener("mouseup",()=>d=false);
+}
+
+/* ---------- TITLE ---------- */
+function typewriter(){
+  const t=document.getElementById("title");
+  const text="Happy Birthday Annie";
+  let i=0,dir=1;
+  setInterval(()=>{
+    i+=dir;
+    t.textContent=text.slice(0,i);
+    if(i===text.length||i===0) dir*=-1;
+  },150);
+}
+
+/* ---------- FLOW ---------- */
+let mainShown=false;
+document.body.addEventListener("click",()=>{
+  if(mainShown) return;
+  if(slideIndex < slides.length-1){
+    slideEls[slideIndex++].style.display="none";
+    slideEls[slideIndex].style.display="flex";
+    return;
+  }
+  slideEls[slideIndex].style.display="none";
+  bow.style.display="flex";
+  door.style.display="block";
+});
+
+bow.onclick=e=>{
+  e.stopPropagation();
+  ribbonSound.currentTime=0;
+  ribbonSound.play();
+  bow.classList.add("untie");
+  setTimeout(()=>bow.style.display="none",700);
+};
+
+door.onclick=e=>{
+  e.stopPropagation();
+  doorSound.currentTime=0;
+  doorSound.play();
+  door.src="dooropen.png";
+  setTimeout(()=>{
+    door.style.display="none";
+    main.style.display="block";
+    mainShown=true;
+    typewriter();
+  },1000);
+};
+
+/* ---------- LETTER ---------- */
 const letterOverlay=document.getElementById("letterOverlay");
 const letterImg=document.getElementById("letterImg");
 const letterExit=document.getElementById("letterExit");
 
 const letterFrames=[
-  "bunny_letter1.png",
-  "bunny_letter2.png",
-  "bunny_letter3.png",
-  "bunny_letter4.png",
-  "bunny_letter5.png",
-  "bunny_letter6.png"
+"bunny_letter1.png",
+"bunny_letter2.png",
+"bunny_letter3.png",
+"bunny_letter4.png",
+"bunny_letter5.png",
+"bunny_letter6.png"
 ];
 
 let letterTimer=null;
 
-function startLetter(){
+pic41El.onclick=e=>{
+  e.stopPropagation();
   letterOverlay.style.display="flex";
   let i=0;
   letterImg.classList.remove("letterFinal");
   letterImg.src=letterFrames[0];
-
   letterTimer=setInterval(()=>{
     i++;
     if(i>=letterFrames.length){
@@ -149,7 +333,7 @@ function startLetter(){
     }
     letterImg.src=letterFrames[i];
   },1000);
-}
+};
 
 letterExit.onclick=()=>{
   letterOverlay.style.display="none";
