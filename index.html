@@ -65,7 +65,8 @@ html,body{
 .overlayContent{
   position:relative;
   max-width:90vw;
-  max-height:90vh;
+  max-height:85vh; /* more vertical room */
+  transform:translateY(-4%); /* lift content upward */
 }
 .overlayContent img{
   max-width:100%;
@@ -279,7 +280,7 @@ letterExit.onclick=()=>{
   if(letterTimer){clearInterval(letterTimer);letterTimer=null;}
 };
 
-/* ---------- FEEDING GAME ---------- */
+/* ---------- FEEDING GAME (unchanged) ---------- */
 const feedOverlay=document.getElementById("feedOverlay");
 const cat=document.getElementById("cat");
 const cake=document.getElementById("cake");
