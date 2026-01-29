@@ -158,7 +158,6 @@ pics.forEach(src=>{
   img.style.top=Math.random()*75+"%";
   main.appendChild(img);
   makeDraggable(img);
-
   if(src==="pic2.png") pic2El=img;
 });
 
@@ -250,7 +249,7 @@ let stage=0;
 let holdingKnife=false;
 let holdingSlice=false;
 
-/* activate game ONLY on pic2 */
+/* activate game */
 pic2El.addEventListener("click",e=>{
   e.stopPropagation();
   overlay.style.display="flex";
@@ -268,11 +267,19 @@ function resetGame(){
   holdingKnife=false;
   holdingSlice=false;
   slice.style.display="none";
+  knife.style.left="";
+  knife.style.top="";
+  knife.style.right="40px";
+  knife.style.bottom="80px";
 }
 
-/* knife pickup */
+/* knife pickup — FIXED OFFSET */
 knife.onmousedown=e=>{
   holdingKnife=true;
+  knife.style.right="auto";
+  knife.style.bottom="auto";
+  knife.style.left=e.clientX-knife.width/2+"px";
+  knife.style.top=e.clientY-knife.height/2+"px";
   e.stopPropagation();
 };
 
@@ -288,7 +295,7 @@ overlay.onmousemove=e=>{
   }
 };
 
-/* slice cake */
+/* slice cake — FIXED OFFSET */
 cake.onclick=e=>{
   if(!holdingKnife)return;
   holdingKnife=false;
