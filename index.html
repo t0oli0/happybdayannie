@@ -53,7 +53,7 @@ html,body{
 }
 @keyframes float{from{transform:translateY(0)}to{transform:translateY(-25px)}}
 
-/* feeding game */
+/* feeding game overlay */
 #overlay{
   display:none;
   position:fixed;inset:0;
@@ -63,10 +63,14 @@ html,body{
   align-items:center
 }
 #game{
-  position:relative;width:520px;height:360px;
+  position:relative;
+  width:520px;height:360px;
   background:#ffb6d9;border-radius:14px
 }
-#exit{position:absolute;top:8px;right:12px;font-size:22px;color:white;cursor:pointer}
+#exit{
+  position:absolute;top:8px;right:12px;
+  font-size:22px;color:white;cursor:pointer
+}
 #cat{position:absolute;left:40px;bottom:40px;width:180px}
 #cake{position:absolute;right:110px;bottom:80px;width:90px}
 #knife{position:absolute;right:40px;bottom:80px;width:60px}
@@ -124,8 +128,15 @@ main.id="main";
 main.innerHTML=`<div id="title"></div>`;
 app.appendChild(main);
 
-/* floating images */
-const pics=["pic2.png","pic3.png","pic4.png","pic5.png","pic6.png","pic7.png","pic8.png","pic9.png"];
+/* floating images (FULL LIST) */
+const pics=[
+"pic2.png","pic3.png","pic4.png","pic5.png","pic6.png","pic7.png","pic8.png","pic9.png","pic10.png",
+"pic11.png","pic12.png","pic13.png","pic14.png","pic15.png","pic16.png","pic18.png","pic19.png","pic20.png",
+"pic21.png","pic22.png","pic23.png","pic24.png","pic25.png","pic26.png","pic28.png","pic29.png","pic30.png",
+"pic31.png","pic32.png","pic33.png","pic34.png","pic35.png","pic36.png","pic38.png","pic39.png","pic40.png",
+"pic41.png","pic42.png","pic43.png","pic44.png","pic45.png"
+];
+
 let pic2El=null;
 
 pics.forEach(src=>{
@@ -135,21 +146,35 @@ pics.forEach(src=>{
   img.style.left=Math.random()*85+"%";
   img.style.top=Math.random()*75+"%";
   main.appendChild(img);
+  makeDraggable(img);
   if(src==="pic2.png") pic2El=img;
 });
 
-/* restore floating animation */
-setInterval(()=>{},1000);
+function makeDraggable(el){
+  let dragging=false,ox=0,oy=0;
+  el.addEventListener("mousedown",e=>{
+    dragging=true;
+    ox=e.clientX-el.offsetLeft;
+    oy=e.clientY-el.offsetTop;
+    e.stopPropagation();
+  });
+  window.addEventListener("mousemove",e=>{
+    if(!dragging)return;
+    el.style.left=e.clientX-ox+"px";
+    el.style.top=e.clientY-oy+"px";
+  });
+  window.addEventListener("mouseup",()=>dragging=false);
+}
 
 /* typewriter */
 function typewriter(){
   const t=document.getElementById("title");
-  const txt="Happy Birthday Annie";
-  let i=0,dir=1;
+  const text="Happy Birthday Annie";
+  let i=0,f=true;
   setInterval(()=>{
-    i+=dir;
-    t.textContent=txt.slice(0,i);
-    if(i===txt.length||i===0)dir*=-1;
+    t.textContent=text.slice(0,f?++i:--i);
+    if(i>=text.length)f=false;
+    if(i<=0)f=true;
   },150);
 }
 
@@ -169,6 +194,7 @@ document.body.addEventListener("click",()=>{
 
 bow.onclick=e=>{
   e.stopPropagation();
+  ribbonSound.currentTime=0;
   ribbonSound.play();
   bow.classList.add("untie");
   setTimeout(()=>bow.style.display="none",700);
@@ -176,6 +202,7 @@ bow.onclick=e=>{
 
 door.onclick=e=>{
   e.stopPropagation();
+  doorSound.currentTime=0;
   doorSound.play();
   door.src="dooropen.png";
   setTimeout(()=>{
@@ -196,23 +223,29 @@ const slice=document.getElementById("slice");
 const exit=document.getElementById("exit");
 
 const frames=[
-"cat_standing.png","cat_eating.png",
-"cat_fat1_standing.png","cat_fat1_eating.png",
-"cat_fat2_standing.png","cat_fat2_eating.png",
-"cat_fat3_standing.png","cat_fat3_eating.png",
+"cat_standing.png",
+"cat_eating.png",
+"cat_fat1_standing.png",
+"cat_fat1_eating.png",
+"cat_fat2_standing.png",
+"cat_fat2_eating.png",
+"cat_fat3_standing.png",
+"cat_fat3_eating.png",
 "cat_done.png"
 ];
 
 let stage=0;
 let holdingKnife=false;
 let holdingSlice=false;
-let awaitingAdvance=false;
+let eatingTimer=null;
 
-pic2El.onclick=e=>{
+/* open game */
+pic2El.addEventListener("click",e=>{
   e.stopPropagation();
   overlay.style.display="flex";
-};
+});
 
+/* exit */
 exit.onclick=()=>{
   overlay.style.display="none";
   resetGame();
@@ -223,16 +256,17 @@ function resetGame(){
   cat.src=frames[0];
   holdingKnife=false;
   holdingSlice=false;
-  awaitingAdvance=false;
   slice.style.display="none";
+  if(eatingTimer){clearTimeout(eatingTimer);eatingTimer=null;}
 }
 
+/* helper */
 function toGame(e){
   const r=game.getBoundingClientRect();
   return {x:e.clientX-r.left,y:e.clientY-r.top};
 }
 
-/* knife */
+/* knife pickup */
 knife.addEventListener("mousedown",e=>{
   const p=toGame(e);
   holdingKnife=true;
@@ -242,7 +276,7 @@ knife.addEventListener("mousedown",e=>{
   e.stopPropagation();
 });
 
-/* move */
+/* follow cursor */
 overlay.addEventListener("mousemove",e=>{
   const p=toGame(e);
   if(holdingKnife){
@@ -255,7 +289,7 @@ overlay.addEventListener("mousemove",e=>{
   }
 });
 
-/* slice */
+/* slice cake */
 cake.onclick=e=>{
   if(!holdingKnife)return;
   const p=toGame(e);
@@ -267,7 +301,7 @@ cake.onclick=e=>{
   slice.style.top=p.y-slice.height/2+"px";
 };
 
-/* feed */
+/* feed slice → AUTO SKIP AFTER 1.5s */
 overlay.addEventListener("mouseup",()=>{
   if(!holdingSlice)return;
   const a=slice.getBoundingClientRect();
@@ -275,25 +309,22 @@ overlay.addEventListener("mouseup",()=>{
   if(!(a.right<b.left||a.left>b.right||a.bottom<b.top||a.top>b.bottom)){
     holdingSlice=false;
     slice.style.display="none";
-    stage++;
+    stage++;                 // eating
     cat.src=frames[stage];
-    awaitingAdvance=true;
+
+    eatingTimer=setTimeout(()=>{
+      stage++;               // next standing
+      cat.src=frames[stage];
+      eatingTimer=null;
+    },1500);
   }
 });
 
-/* advance ONLY on fresh click */
-cat.addEventListener("click",e=>{
-  if(!awaitingAdvance)return;
-  if(frames[stage].includes("eating")){
-    awaitingAdvance=false;
-    stage++;
-    cat.src=frames[stage];
-    if(frames[stage]==="cat_done.png"){
-      cat.onclick=()=>{
-        overlay.style.display="none";
-        resetGame();
-      };
-    }
+/* final exit */
+cat.addEventListener("click",()=>{
+  if(frames[stage]==="cat_done.png"){
+    overlay.style.display="none";
+    resetGame();
   }
 });
 </script>
