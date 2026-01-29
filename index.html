@@ -1,54 +1,242 @@
-/* ---------- GALLERY (photos of us) ---------- */
-const galleryOverlay = document.getElementById("galleryOverlay");
-const galleryExit = document.getElementById("galleryExit");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>happy birthday annie</title>
 
-const usPhotos = [
-  "photos of us (1).JPEG","photos of us (1).jpg","photos of us (1).png",
-  "photos of us (2).JPEG","photos of us (2).jpg","photos of us (2).png",
-  "photos of us (3).JPEG","photos of us (3).JPG","photos of us (3).png",
-  "photos of us (4).JPEG","photos of us (4).jpg","photos of us (4).png",
-  "photos of us (5).JPEG","photos of us (5).jpg","photos of us (5).PNG",
-  "photos of us (6).JPEG","photos of us (6).jpg","photos of us (6).PNG",
-  "photos of us (7).JPEG","photos of us (7).jpg","photos of us (7).PNG",
-  "photos of us (8).JPEG","photos of us (8).jpg","photos of us (8).png",
-  "photos of us (9).JPEG","photos of us (9).jpg","photos of us (9).png",
-  "photos of us (10).JPEG","photos of us (10).jpg",
-  "photos of us (11).JPEG","photos of us (11).jpg",
-  "photos of us (12).JPEG","photos of us (12).jpg",
-  "photos of us (13).JPEG","photos of us (13).jpg",
-  "photos of us (14).JPEG","photos of us (14).jpg",
-  "photos of us (15).JPEG","photos of us (15).jpg",
-  "photos of us (16).jpeg","photos of us (16).jpg",
-  "photos of us (17).JPEG","photos of us (17).jpg",
-  "photos of us (18).JPEG","photos of us (18).jpg",
-  "photos of us (19).jpg",
-  "photos of us (20).jpg",
-  "photos of us (21).jpg"
+<style>
+html,body{
+  margin:0;padding:0;width:100%;height:100%;
+  background:#ffd7e8;overflow:hidden;
+  font-family:"Comic Sans MS",cursive;
+}
+#app{width:100%;height:100%;position:relative}
+
+/* slides */
+.slide{position:absolute;inset:0;display:none;justify-content:center;align-items:center}
+.slide img{max-width:70%;max-height:70%}
+
+/* main */
+#main{display:none;width:100%;height:100%;position:relative}
+
+/* floating images */
+.float{
+  position:absolute;
+  width:90px;
+  animation:float 4s ease-in-out infinite alternate;
+  cursor:pointer;
+}
+@keyframes float{
+  from{transform:translateY(0)}
+  to{transform:translateY(-25px)}
+}
+
+/* overlays */
+.overlay{
+  display:none;
+  position:fixed;inset:0;
+  background:rgba(255,215,232,.95);
+  z-index:999;
+  justify-content:center;
+  align-items:center;
+}
+.overlayContent{
+  position:relative;
+  max-width:90vw;
+  max-height:90vh;
+}
+.closeBtn{
+  position:absolute;
+  top:-10px;right:-10px;
+  background:#ff9ed9;
+  color:white;
+  width:32px;height:32px;
+  border-radius:50%;
+  line-height:32px;
+  text-align:center;
+  cursor:pointer;
+}
+
+/* gallery */
+.polaroid{
+  position:absolute;
+  background:white;
+  padding:8px 8px 20px 8px;
+  box-shadow:0 6px 12px rgba(0,0,0,.15);
+}
+.polaroid img{
+  width:160px;
+  display:block;
+}
+
+/* maze */
+#mazeBox{
+  width:520px;height:520px;
+  background:#ffc4df;
+  border-radius:16px;
+  position:relative;
+}
+#player{position:absolute;width:36px;left:20px;top:20px}
+.wall{position:absolute;background:#ff8fc7}
+#goal{
+  position:absolute;width:40px;height:40px;
+  right:20px;bottom:20px;
+  background:white;border-radius:50%;
+}
+</style>
+</head>
+
+<body>
+<div id="app"></div>
+
+<!-- GALLERY -->
+<div id="galleryOverlay" class="overlay">
+  <div class="overlayContent">
+    <div class="closeBtn" onclick="closeGallery()">✕</div>
+  </div>
+</div>
+
+<!-- SPOTIFY -->
+<div id="spotifyOverlay" class="overlay">
+  <div class="overlayContent">
+    <div class="closeBtn" onclick="closeSpotify()">✕</div>
+    <iframe style="border-radius:12px"
+      src="https://open.spotify.com/embed/playlist/0zxE4sI9k9ldR12Q4fImLc"
+      width="380" height="380" frameborder="0"
+      allow="encrypted-media"></iframe>
+  </div>
+</div>
+
+<!-- MAZE -->
+<div id="mazeOverlay" class="overlay">
+  <div id="mazeBox" class="overlayContent">
+    <div class="closeBtn" onclick="closeMaze()">✕</div>
+    <img id="player" src="maze.PNG">
+    <div id="goal"></div>
+    <div class="wall" style="left:0;top:0;width:100%;height:20px"></div>
+    <div class="wall" style="left:0;top:0;width:20px;height:100%"></div>
+    <div class="wall" style="right:0;top:0;width:20px;height:100%"></div>
+    <div class="wall" style="left:0;bottom:0;width:100%;height:20px"></div>
+  </div>
+</div>
+
+<script>
+/* ---------- SLIDES ---------- */
+const app=document.getElementById("app");
+const slides=["slide1.png","slide2.png","slide3.png","slide4.png","slide5.png"];
+let slideIndex=0;
+
+slides.forEach((src,i)=>{
+  const d=document.createElement("div");
+  d.className="slide";
+  if(i===0)d.style.display="flex";
+  d.innerHTML=`<img src="${src}">`;
+  app.appendChild(d);
+});
+const slideEls=document.querySelectorAll(".slide");
+
+document.body.onclick=()=>{
+  if(slideIndex<slides.length-1){
+    slideEls[slideIndex++].style.display="none";
+    slideEls[slideIndex].style.display="flex";
+  }else{
+    slideEls[slideIndex].style.display="none";
+    showMain();
+  }
+};
+
+function showMain(){
+  const main=document.createElement("div");
+  main.id="main";
+  app.appendChild(main);
+
+  const pics=[
+    "pic2.png","pic3.png","pic11.png","pic32.png",
+    "pic4.png","pic5.png","pic6.png","pic7.png","pic8.png","pic9.png"
+  ];
+
+  pics.forEach(src=>{
+    const img=document.createElement("img");
+    img.src=src;
+    img.className="float";
+    img.style.left=Math.random()*80+"%";
+    img.style.top=Math.random()*70+"%";
+    main.appendChild(img);
+
+    if(src==="pic32.png") img.onclick=openGallery;
+    if(src==="pic11.png") img.onclick=openSpotify;
+    if(src==="pic3.png") img.onclick=openMaze;
+  });
+}
+
+/* ---------- GALLERY ---------- */
+const usPhotos=[
+"photos of us (1).JPEG","photos of us (1).jpg","photos of us (1).png",
+"photos of us (2).JPEG","photos of us (2).jpg","photos of us (2).png",
+"photos of us (3).JPEG","photos of us (3).JPG","photos of us (3).png",
+"photos of us (4).JPEG","photos of us (4).jpg","photos of us (4).png",
+"photos of us (5).JPEG","photos of us (5).jpg","photos of us (5).PNG",
+"photos of us (6).JPEG","photos of us (6).jpg","photos of us (6).PNG",
+"photos of us (7).JPEG","photos of us (7).jpg","photos of us (7).PNG",
+"photos of us (8).JPEG","photos of us (8).jpg","photos of us (8).png",
+"photos of us (9).JPEG","photos of us (9).jpg","photos of us (9).png",
+"photos of us (10).JPEG","photos of us (10).jpg",
+"photos of us (11).JPEG","photos of us (11).jpg",
+"photos of us (12).JPEG","photos of us (12).jpg",
+"photos of us (13).JPEG","photos of us (13).jpg",
+"photos of us (14).JPEG","photos of us (14).jpg",
+"photos of us (15).JPEG","photos of us (15).jpg",
+"photos of us (16).jpeg","photos of us (16).jpg",
+"photos of us (17).JPEG","photos of us (17).jpg",
+"photos of us (18).JPEG","photos of us (18).jpg",
+"photos of us (19).jpg","photos of us (20).jpg","photos of us (21).jpg"
 ];
 
-pic32.onclick = e => {
-  e.stopPropagation();
-  galleryOverlay.style.display = "flex";
+function openGallery(){
+  const overlay=document.getElementById("galleryOverlay");
+  const box=overlay.querySelector(".overlayContent");
+  box.querySelectorAll(".polaroid").forEach(p=>p.remove());
+  overlay.style.display="flex";
 
-  const box = galleryOverlay.querySelector(".overlayContent");
-  box.querySelectorAll(".polaroid").forEach(p => p.remove());
-
-  usPhotos.forEach(src => {
-    const img = new Image();
-    img.onload = () => {
-      const p = document.createElement("div");
-      p.className = "polaroid";
-      p.style.left = Math.random()*60 + "%";
-      p.style.top = Math.random()*60 + "%";
-      p.style.transform = `rotate(${Math.random()*10 - 5}deg)`;
+  usPhotos.forEach(src=>{
+    const img=new Image();
+    img.onload=()=>{
+      const p=document.createElement("div");
+      p.className="polaroid";
+      p.style.left=Math.random()*60+"%";
+      p.style.top=Math.random()*60+"%";
       p.appendChild(img);
       box.appendChild(p);
-      makeDraggable(p);
     };
-    img.src = src;
+    img.src=src;
   });
-};
+}
+function closeGallery(){galleryOverlay.style.display="none"}
 
-galleryExit.onclick = () => {
-  galleryOverlay.style.display = "none";
-};
+/* ---------- SPOTIFY ---------- */
+function openSpotify(){spotifyOverlay.style.display="flex"}
+function closeSpotify(){spotifyOverlay.style.display="none"}
+
+/* ---------- MAZE ---------- */
+const player=document.getElementById("player");
+function openMaze(){
+  mazeOverlay.style.display="flex";
+  player.style.left="20px";
+  player.style.top="20px";
+}
+function closeMaze(){mazeOverlay.style.display="none"}
+
+document.addEventListener("keydown",e=>{
+  if(mazeOverlay.style.display!=="flex") return;
+  let dx=0,dy=0;
+  if(e.key==="ArrowUp"||e.key==="w")dy=-6;
+  if(e.key==="ArrowDown"||e.key==="s")dy=6;
+  if(e.key==="ArrowLeft"||e.key==="a")dx=-6;
+  if(e.key==="ArrowRight"||e.key==="d")dx=6;
+  player.style.left=(player.offsetLeft+dx)+"px";
+  player.style.top=(player.offsetTop+dy)+"px";
+});
+</script>
+</body>
+</html>
