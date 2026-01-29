@@ -83,40 +83,34 @@ html,body{
 /* letter */
 .letterFinal{ transform:translateY(-24%); }
 
-/* ---------- MAZE ---------- */
+/* feeding game */
+#game{
+  width:520px;height:360px;
+  background:#ffb6d9;border-radius:14px
+}
+#cat{position:absolute;left:40px;bottom:40px;width:180px}
+#cake{position:absolute;right:110px;bottom:80px;width:90px}
+#knife{position:absolute;right:40px;bottom:80px;width:60px}
+#slice{position:absolute;width:90px;display:none;pointer-events:none}
+
+/* maze */
 #mazeBox{
   width:520px;height:520px;
   background:#ffc4df;
   border-radius:16px;
   position:relative;
 }
-.wall{
-  position:absolute;
-  background:#ff8fc7;
-}
-#player{
-  position:absolute;
-  width:36px;height:36px;
-}
+.wall{position:absolute;background:#ff8fc7}
+#player{position:absolute;width:36px;height:36px}
 #goal{
-  position:absolute;
-  width:40px;height:40px;
-  background:#fff;
-  border-radius:50%;
-  right:20px;
-  bottom:20px;
+  position:absolute;width:40px;height:40px;
+  background:#fff;border-radius:50%;
+  right:20px;bottom:20px
 }
 #mazeVideo{
-  display:none;
-  position:absolute;
-  inset:0;
-  background:black;
+  display:none;position:absolute;inset:0;background:black
 }
-#mazeVideo video{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
+#mazeVideo video{width:100%;height:100%;object-fit:cover}
 </style>
 </head>
 
@@ -126,20 +120,36 @@ html,body{
 <audio id="ribbonSound" src="ribbon.mp3"></audio>
 <audio id="doorSound" src="doorwow.mp3"></audio>
 
-<!-- MAZE OVERLAY -->
+<!-- FEEDING GAME -->
+<div id="feedOverlay" class="overlay">
+  <div id="game" class="overlayContent">
+    <div class="closeBtn" id="feedExit">✕</div>
+    <img id="cat" src="cat_standing.png">
+    <img id="cake" src="cake_full.png">
+    <img id="knife" src="knife.png">
+    <img id="slice" src="cake_slice.png">
+  </div>
+</div>
+
+<!-- LETTER -->
+<div id="letterOverlay" class="overlay">
+  <div class="overlayContent">
+    <div class="closeBtn" id="letterExit">✕</div>
+    <img id="letterImg" src="">
+  </div>
+</div>
+
+<!-- MAZE -->
 <div id="mazeOverlay" class="overlay">
   <div id="mazeBox" class="overlayContent">
     <div class="closeBtn" id="mazeExit">✕</div>
-
-    <img id="player" src="maze.png">
+    <img id="player" src="maze.PNG">
     <div id="goal"></div>
 
-    <!-- walls -->
     <div class="wall" style="left:0;top:0;width:100%;height:20px"></div>
     <div class="wall" style="left:0;top:0;width:20px;height:100%"></div>
     <div class="wall" style="right:0;top:0;width:20px;height:100%"></div>
     <div class="wall" style="left:0;bottom:0;width:100%;height:20px"></div>
-
     <div class="wall" style="left:80px;top:60px;width:20px;height:360px"></div>
     <div class="wall" style="left:160px;top:0;width:20px;height:300px"></div>
     <div class="wall" style="left:240px;top:140px;width:20px;height:380px"></div>
@@ -152,7 +162,7 @@ html,body{
 </div>
 
 <script>
-/* ---------- SLIDES + MAIN (unchanged) ---------- */
+/* ---------- SLIDES ---------- */
 const app=document.getElementById("app");
 const slides=["slide1.png","slide2.png","slide3.png","slide4.png","slide5.png"];
 let slideIndex=0;
@@ -166,6 +176,7 @@ slides.forEach((src,i)=>{
 });
 const slideEls=document.querySelectorAll(".slide");
 
+/* bow + door */
 const bow=document.createElement("div");
 bow.id="bow";
 bow.innerHTML=`<img src="bowleft.png"><img src="bowright.png">`;
@@ -176,24 +187,50 @@ door.id="door";
 door.src="doorclosed.png";
 app.appendChild(door);
 
+/* main */
 const main=document.createElement("div");
 main.id="main";
 main.innerHTML=`<div id="title">Happy Birthday Annie</div>`;
 app.appendChild(main);
 
-/* floating images */
-const pics=["maze.png","pic2.png","pic41.png"];
-let mazeIcon=null;
+/* ---------- FLOATING IMAGES ---------- */
+const pics=[
+"pic2.png","pic3.png","pic4.png","pic5.png","pic6.png","pic7.png","pic8.png","pic9.png","pic10.png",
+"pic11.png","pic12.png","pic13.png","pic14.png","pic15.png","pic16.png","pic18.png","pic19.png","pic20.png",
+"pic21.png","pic22.png","pic23.png","pic24.png","pic25.png","pic26.png","pic28.png","pic29.png","pic30.png",
+"pic31.png","pic32.png","pic33.png","pic34.png","pic35.png","pic36.png","pic38.png","pic39.png","pic40.png",
+"pic41.png","pic42.png","pic43.png","pic44.png","pic45.png"
+];
+
+let pic2El=null,pic3El=null,pic41El=null;
 
 pics.forEach(src=>{
   const img=document.createElement("img");
   img.src=src;
   img.className="float";
-  img.style.left=Math.random()*80+"%";
-  img.style.top=Math.random()*70+"%";
+  img.style.left=Math.random()*85+"%";
+  img.style.top=Math.random()*75+"%";
   main.appendChild(img);
-  if(src==="maze.png") mazeIcon=img;
+  makeDraggable(img);
+
+  if(src==="pic2.png") pic2El=img;
+  if(src==="pic3.png") pic3El=img;
+  if(src==="pic41.png") pic41El=img;
 });
+
+function makeDraggable(el){
+  let d=false,ox=0,oy=0;
+  el.onmousedown=e=>{
+    d=true;ox=e.clientX-el.offsetLeft;oy=e.clientY-el.offsetTop;
+    e.stopPropagation();
+  };
+  window.onmousemove=e=>{
+    if(!d)return;
+    el.style.left=e.clientX-ox+"px";
+    el.style.top=e.clientY-oy+"px";
+  };
+  window.onmouseup=()=>d=false;
+}
 
 /* flow */
 let mainShown=false;
@@ -208,12 +245,14 @@ document.body.onclick=()=>{
   bow.style.display="flex";
   door.style.display="block";
 };
+
 bow.onclick=e=>{
   e.stopPropagation();
   ribbonSound.play();
   bow.classList.add("untie");
   setTimeout(()=>bow.style.display="none",700);
 };
+
 door.onclick=e=>{
   e.stopPropagation();
   doorSound.play();
@@ -225,7 +264,47 @@ door.onclick=e=>{
   },1000);
 };
 
-/* ---------- MAZE LOGIC ---------- */
+/* ---------- CAKE GAME ---------- */
+const feedOverlay=document.getElementById("feedOverlay");
+const feedExit=document.getElementById("feedExit");
+pic2El.onclick=e=>{e.stopPropagation();feedOverlay.style.display="flex";};
+feedExit.onclick=()=>feedOverlay.style.display="none";
+
+/* ---------- LETTER ---------- */
+const letterOverlay=document.getElementById("letterOverlay");
+const letterImg=document.getElementById("letterImg");
+const letterExit=document.getElementById("letterExit");
+const letterFrames=[
+"bunny_letter1.png","bunny_letter2.png","bunny_letter3.png",
+"bunny_letter4.png","bunny_letter5.png","bunny_letter6.png"
+];
+let letterTimer=null;
+
+pic41El.onclick=e=>{
+  e.stopPropagation();
+  letterOverlay.style.display="flex";
+  let i=0;
+  letterImg.classList.remove("letterFinal");
+  letterImg.src=letterFrames[0];
+  letterTimer=setInterval(()=>{
+    i++;
+    if(i>=letterFrames.length){
+      clearInterval(letterTimer);
+      letterTimer=null;
+      letterImg.classList.add("letterFinal");
+      return;
+    }
+    letterImg.src=letterFrames[i];
+  },1000);
+};
+
+letterExit.onclick=()=>{
+  letterOverlay.style.display="none";
+  letterImg.classList.remove("letterFinal");
+  if(letterTimer)clearInterval(letterTimer);
+};
+
+/* ---------- MAZE ---------- */
 const mazeOverlay=document.getElementById("mazeOverlay");
 const mazeExit=document.getElementById("mazeExit");
 const player=document.getElementById("player");
@@ -234,7 +313,7 @@ const walls=[...document.querySelectorAll(".wall")];
 const videoBox=document.getElementById("mazeVideo");
 const video=videoBox.querySelector("video");
 
-mazeIcon.onclick=e=>{
+pic3El.onclick=e=>{
   e.stopPropagation();
   mazeOverlay.style.display="flex";
   player.style.left="30px";
@@ -243,24 +322,21 @@ mazeIcon.onclick=e=>{
 
 mazeExit.onclick=()=>{
   mazeOverlay.style.display="none";
-  video.pause();
-  video.currentTime=0;
+  video.pause();video.currentTime=0;
   videoBox.style.display="none";
 };
 
-function collide(r1,r2){
-  return !(r1.right<r2.left||r1.left>r2.right||r1.bottom<r2.top||r1.top>r2.bottom);
+function collide(a,b){
+  return !(a.right<b.left||a.left>b.right||a.bottom<b.top||a.top>b.bottom);
 }
 
 document.addEventListener("keydown",e=>{
   if(mazeOverlay.style.display!=="flex")return;
-
   let dx=0,dy=0;
   if(e.key==="ArrowUp"||e.key==="w")dy=-6;
   if(e.key==="ArrowDown"||e.key==="s")dy=6;
   if(e.key==="ArrowLeft"||e.key==="a")dx=-6;
   if(e.key==="ArrowRight"||e.key==="d")dx=6;
-
   if(!dx&&!dy)return;
 
   const prev={x:player.offsetLeft,y:player.offsetTop};
